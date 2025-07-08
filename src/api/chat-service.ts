@@ -7,14 +7,15 @@ import { logger } from '../utils/logger';
 import useAppStore from '../state/appStore';
 
 class ChatService {
-    private isGenerating = false;
+    private abortController: AbortController | null = null;
 
     public async streamAIResponse(messages: AIMessage[], provider: AIProvider, onToken: (token: string) => void): Promise<void> {
-        if (this.isGenerating) {
+        if (this.abortController) {
             logger.warn('ChatService', 'Une génération est déjà en cours.');
             return;
         }
-        this.isGenerating = true;
+        this.abortController = new AbortController();
+        const signal = this.abortController.signal;
 
         try {
             const { apiKeys } = useAppStore.getState();
@@ -22,16 +23,16 @@ class ChatService {
 
             switch (provider) {
                 case 'openai':
-                    streamer = (msgs: AIMessage[], onTkn: (tkn: string) => void) => getOpenAIStream(msgs, apiKeys.openai, onTkn);
+                    streamer = (msgs: AIMessage[], onTkn: (tkn: string) => void) => getOpenAIStream(msgs, apiKeys.openai, onTkn, signal);
                     break;
                 case 'anthropic':
-                    streamer = (msgs: AIMessage[], onTkn: (tkn: string) => void) => getAnthropicStream(msgs, apiKeys.anthropic, onTkn);
+                    streamer = (msgs: AIMessage[], onTkn: (tkn: string) => void) => getAnthropicStream(msgs, apiKeys.anthropic, onTkn, signal);
                     break;
                 case 'grok':
-                    streamer = (msgs: AIMessage[], onTkn: (tkn: string) => void) => getGrokStream(msgs, apiKeys.grok, onTkn);
+                    streamer = (msgs: AIMessage[], onTkn: (tkn: string) => void) => getGrokStream(msgs, apiKeys.grok, onTkn, signal);
                     break;
                 case 'local':
-                    streamer = getLocalStream;
+                    streamer = (msgs: AIMessage[], onTkn: (tkn: string) => void) => getLocalStream(msgs, onTkn, signal);
                     break;
                 default:
                     logger.error('ChatService', `Fournisseur non supporté: ${provider}`);
@@ -41,16 +42,20 @@ class ChatService {
             await streamer(messages, onToken);
 
         } catch (error) {
-            logger.error('ChatService', 'Erreur lors du streaming de la réponse IA', error);
-            throw error;
+            if (error.name === 'AbortError') {
+                logger.info('ChatService', 'La génération a été annulée.');
+            } else {
+                logger.error('ChatService', 'Erreur lors du streaming de la réponse IA', error);
+                throw error;
+            }
         } finally {
-            this.isGenerating = false;
+            this.abortController = null;
         }
     }
 
     public stopGeneration(): void {
-        if (this.isGenerating) {
-            this.isGenerating = false; // This is a simplified stop mechanism
+        if (this.abortController) {
+            this.abortController.abort();
             logger.info('ChatService', 'Arrêt de la génération demandé.');
         }
     }

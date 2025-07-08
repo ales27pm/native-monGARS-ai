@@ -38,7 +38,7 @@ export async function getGrokChatCompletion(messages: AIMessage[], apiKey: strin
     return content;
 }
 
-export async function getGrokStream(messages: AIMessage[], apiKey: string, onToken: (token: string) => void): Promise<void> {
+export async function getGrokStream(messages: AIMessage[], apiKey: string, onToken: (token: string) => void, signal: AbortSignal): Promise<void> {
     const grok = new OpenAI({
         apiKey,
         baseURL: 'https://api.x.ai/v1',
@@ -49,9 +49,12 @@ export async function getGrokStream(messages: AIMessage[], apiKey: string, onTok
         messages: messages.map((msg) => ({ role: msg.role, content: msg.content })),
         model: 'grok-1.5-flash',
         stream: true,
-    });
+    }, { signal });
 
     for await (const chunk of stream) {
+        if (signal.aborted) {
+            throw new Error('AbortError');
+        }
         const content = chunk.choices[0]?.delta?.content;
         if (content) {
             onToken(content);

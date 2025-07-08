@@ -34,9 +34,11 @@ export default function ChatScreen() {
                 ));
             });
         } catch (error) {
-            logger.error('ChatScreen', 'Erreur lors de la génération de la réponse IA', error);
-            setMessages(prev => prev.map(msg => 
-                msg.id === assistantMessageId ? { ...msg, content: 'Erreur de connexion.' } : msg
+            logger.error('ChatScreen', 'Erreur de streaming', error);
+            setMessages(prev => prev.map(msg =>
+                msg.id === assistantMessageId
+                    ? { ...msg, content: `Désolé, une erreur est survenue : ${(error as Error).message}`, isError: true }
+                    : msg
             ));
         } finally {
             setIsGenerating(false);

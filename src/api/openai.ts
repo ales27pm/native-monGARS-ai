@@ -29,15 +29,18 @@ export async function getOpenAIChatCompletion(messages: AIMessage[], apiKey: str
     return content;
 }
 
-export async function getOpenAIStream(messages: AIMessage[], apiKey: string, onToken: (token: string) => void): Promise<void> {
+export async function getOpenAIStream(messages: AIMessage[], apiKey: string, onToken: (token: string) => void, signal: AbortSignal): Promise<void> {
     const openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
     const stream = await openai.chat.completions.create({
         messages: messages.map((msg) => ({ role: msg.role, content: msg.content })),
         model: 'gpt-4o-mini',
         stream: true,
-    });
+    }, { signal });
 
     for await (const chunk of stream) {
+        if (signal.aborted) {
+            throw new Error('AbortError');
+        }
         const content = chunk.choices[0]?.delta?.content;
         if (content) {
             onToken(content);

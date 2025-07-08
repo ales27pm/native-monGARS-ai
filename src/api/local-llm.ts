@@ -11,7 +11,7 @@ class LocalLLMService {
         this.isReady = true;
     }
 
-    public streamResponse(messages: AIMessage[], onToken: (token: string) => void): Promise<void> {
+    public streamResponse(messages: AIMessage[], onToken: (token: string) => void, signal: AbortSignal): Promise<void> {
         if (!this.isReady) {
             throw new Error('Le service LLM local n\'est pas prêt.');
         }
@@ -20,12 +20,25 @@ class LocalLLMService {
             const eventEmitter = new NativeEventEmitter(TurboModuleRegistry.LocalLLMModule);
             const tokenListener = eventEmitter.addListener('onGeneratedToken', (event: { token: string }) => onToken(event.token));
             const endListener = eventEmitter.addListener('onGenerationEnd', (event?: { error?: string }) => {
-                tokenListener.remove(); endListener.remove();
+                tokenListener.remove();
+                endListener.remove();
+                abortListener.remove();
                 event?.error ? reject(new Error(event.error)) : resolve();
             });
 
+            const abortListener = signal.addEventListener('abort', () => {
+                tokenListener.remove();
+                endListener.remove();
+                abortListener.remove();
+                coreMLService.stopGeneration();
+                reject(new Error('AbortError'));
+            });
+
             coreMLService.generateStream(messages).catch(err => {
-                tokenListener.remove(); endListener.remove(); reject(err);
+                tokenListener.remove();
+                endListener.remove();
+                abortListener.remove();
+                reject(err);
             });
         });
     }

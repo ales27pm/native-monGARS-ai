@@ -1,46 +1,67 @@
 // ====================================================================================
 import Anthropic from '@anthropic-ai/sdk';
-import { logger } from '../utils/logger';
-import { AIMessage } from '../types/ai';
+import { logger } from '@/utils/logger';
+import { AIMessage } from '@/types/ai';
 
 export async function checkAnthropicService(apiKey: string): Promise<void> {
     if (!apiKey) throw new Error('missing_key');
     try {
-        if (!apiKey.startsWith('sk-ant-')) {
-            throw new Error('Format de clé invalide.');
-        }
-        logger.info('Anthropic', 'La clé API Anthropic a un format valide.');
+        const anthropic = new Anthropic({ apiKey });
+        await anthropic.messages.create({
+            model: 'claude-3-haiku-20240307',
+            max_tokens: 1,
+            messages: [{ role: 'user', content: 'ping' }],
+        });
+        logger.info('Anthropic', 'La clé API Anthropic est valide.');
     } catch (error) {
-        logger.warn('Anthropic', 'La vérification de la clé API Anthropic a échoué.', error);
+        logger.warn('Anthropic', "La vérification de la clé API Anthropic a échoué.", error);
         throw new Error('Clé invalide ou problème réseau.');
     }
 }
 
-export async function getAnthropicChatCompletion(messages: AIMessage[], apiKey: string): Promise<string> { // <-- patched
+export async function getAnthropicChatCompletion(messages: AIMessage[], apiKey: string): Promise<string> {
     const anthropic = new Anthropic({ apiKey });
-    const response = await anthropic.messages.create({
-        model: "claude-3-haiku-20240307",
-        max_tokens: 1024,
-        messages: messages.map((msg) => ({ role: msg.role, content: msg.content })), // <-- patched
+
+    const userMessages = messages.map((msg) => ({
+        role: msg.role as 'user' | 'assistant',
+        content: msg.content,
+    }));
+
+    const completion = await anthropic.messages.create({
+        model: 'claude-3-opus-20240229',
+        max_tokens: 4096,
+        messages: userMessages,
     });
-    
-    if (response.content[0]?.type === 'text') {
-        return response.content[0].text;
+
+    const content = completion.content[0];
+    if (content?.type === 'text') {
+        return content.text;
     }
-    throw new Error('Réponse inattendue de l\'API Anthropic.');
+
+    throw new Error('No content in response');
 }
 
-export async function getAnthropicStream(messages: AIMessage[], apiKey: string, onToken: (token: string) => void): Promise<void> {
+export async function getAnthropicStream(messages: AIMessage[], apiKey: string, onToken: (token: string) => void, signal: AbortSignal): Promise<void> {
     const anthropic = new Anthropic({ apiKey });
-    const stream = await anthropic.messages.stream({
-        model: "claude-3-haiku-20240307",
-        max_tokens: 1024,
-        messages: messages.map((msg) => ({ role: msg.role, content: msg.content })),
-    });
 
-    for await (const event of stream) {
-        if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-            onToken(event.delta.text);
+    const userMessages = messages.map((msg) => ({
+        role: msg.role as 'user' | 'assistant',
+        content: msg.content,
+    }));
+
+    const stream = await anthropic.messages.create({
+        model: 'claude-3-opus-20240229',
+        max_tokens: 4096,
+        messages: userMessages,
+        stream: true,
+    }, { signal });
+
+    for await (const chunk of stream) {
+        if (signal.aborted) {
+            throw new Error('AbortError');
+        }
+        if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
+            onToken(chunk.delta.text);
         }
     }
 }
