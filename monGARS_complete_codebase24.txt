@@ -1,0 +1,1910 @@
+// ===== monGARS Complete Codebase v24 FULL =====
+// ===== File: monGARS_complete_project_bundle.txt =====
+// ===== CONSOLIDATED FINAL CODEBASE: monGARS =====
+// Generated on July 7, 2025. Updated: added deploy script; fixed model download logic.
+
+// ===== File: package.json =====
+// ====================================================================================
+{
+  "name": "mongars",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "test": "jest",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write .",
+    "type-check": "tsc --noEmit",
+    "codegen": "cd ios && RCT_NEW_ARCH_ENABLED=1 bundle exec pod install"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "^14.0.0",
+    "@react-native-async-storage/async-storage": "1.23.1",
+    "@react-navigation/bottom-tabs": "^6.5.20",
+    "@react-navigation/native": "^6.1.17",
+    "@react-navigation/native-stack": "^6.9.26",
+    "@anthropic-ai/sdk": "^0.22.0",
+    "clsx": "^2.1.1",
+    "date-fns": "^3.6.0",
+    "expo": "~51.0.14",
+    "expo-av": "~14.0.5",
+    "expo-build-properties": "~0.12.1",
+    "expo-constants": "~16.0.2",
+    "expo-dev-client": "~4.0.18",
+    "expo-file-system": "~17.0.1",
+    "expo-font": "~12.0.6",
+    "expo-image-picker": "~15.0.5",
+    "expo-sqlite": "~14.0.3",
+    "expo-status-bar": "~1.12.1",
+    "expo-updates": "~0.25.17",
+    "nativewind": "^2.0.11",
+    "openai": "^4.51.0",
+    "react": "18.2.0",
+    "react-native": "0.74.2",
+    "react-native-gesture-handler": "~2.16.1",
+    "react-native-reanimated": "~3.10.1",
+    "react-native-safe-area-context": "4.10.1",
+    "react-native-screens": "3.31.1",
+    "tailwind-merge": "^2.3.0",
+    "zustand": "^4.5.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@types/react": "~18.2.45",
+    "eslint": "^8.57.0",
+    "eslint-config-expo": "^7.0.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "jest": "^29.2.1",
+    "jest-expo": "~51.0.1",
+    "prettier": "^3.3.2",
+    "tailwindcss": "3.3.2",
+    "typescript": "~5.3.3"
+  },
+  "private": true,
+  "codegenConfig": {
+    "name": "MonGARSTurboModules",
+    "type": "modules",
+    "jsSrcsDir": "src/types",
+    "android": {
+      "javaPackageName": "com.mongars.turbomodules"
+    },
+    "ios": {
+      "moduleName": "MonGARSTurboModules"
+    }
+  }
+}
+
+
+// ====================================================================================
+// ===== End of File: package.json =====
+
+// ===== File: app.json =====
+// ====================================================================================
+{
+  "expo": {
+    "name": "monGARS AI",
+    "slug": "mon-gars-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#111827"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mongars.ai",
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "NSSpeechRecognitionUsageDescription": "L'application utilise la reconnaissance vocale pour convertir votre voix en texte.",
+        "NSMicrophoneUsageDescription": "L'application a besoin d'accéder au microphone pour la reconnaissance vocale."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#111827"
+      },
+      "package": "com.mongars.ai"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "newArchEnabled": true
+          },
+          "android": {
+            "newArchEnabled": true
+          }
+        }
+      ]
+    ]
+  }
+}
+
+
+// ====================================================================================
+// ===== End of File: app.json =====
+
+// ===== File: eas.json =====
+
+cli:
+  version: >= 7.6.0
+
+build:
+  development:
+    developmentClient: true
+    distribution: internal
+    ios:
+      resourceClass: m1-medium
+  preview:
+    distribution: internal
+    ios:
+      resourceClass: m1-medium
+      image: latest
+  production:
+    ios:
+      resourceClass: m1-medium
+      image: latest
+      autoIncrement: true
+
+submit:
+  production:
+    ios:
+      appleId: YOUR_APPLE_ID_HERE
+      ascAppId: YOUR_APP_STORE_CONNECT_APP_ID
+
+// ===== End of File: {label} =====
+
+// ===== File: tailwind.config.js =====
+// ====================================================================================
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    "./App.{js,jsx,ts,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}"
+  ],
+  theme: {
+    extend: {
+        colors: {
+            'dark-bg': '#111827',
+            'dark-surface': '#1f2937',
+            'dark-border': '#374151',
+            'dark-text': '#f9fafb',
+            'dark-text-secondary': '#9ca3af',
+            'brand-blue': '#2563eb',
+        }
+    },
+  },
+  plugins: [],
+}
+
+
+// ====================================================================================
+// ===== End of File: tailwind.config.js =====
+
+// ===== File: babel.config.js =====
+// ====================================================================================
+module.exports = function(api) {
+  api.cache(true);
+  return {
+    presets: ['babel-preset-expo'],
+    plugins: [
+        'nativewind/babel',
+        'react-native-reanimated/plugin'
+    ],
+  };
+};
+
+
+// ====================================================================================
+// ===== End of File: babel.config.js =====
+
+// ===== File: tsconfig.json =====
+// ====================================================================================
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
+  ]
+}
+
+
+// ====================================================================================
+// ===== End of File: tsconfig.json =====
+
+// ===== File: index.js =====
+// ====================================================================================
+import 'react-native-gesture-handler';
+import { registerRootComponent } from 'expo';
+import App from './App';
+
+registerRootComponent(App);
+
+
+// ====================================================================================
+// ===== End of File: index.js =====
+
+// ===== File: App.tsx =====
+// ====================================================================================
+import React, { useEffect, useState } from 'react';
+import { StatusBar } from 'expo-status-bar';
+import { View, Text, ActivityIndicator } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { NavigationContainer } from '@react-navigation/native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { AppNavigator } from './src/navigation/AppNavigator';
+import { ErrorBoundary } from './src/components/ErrorBoundary';
+import { initializeTurboModules } from './src/services/TurboModuleRegistry';
+import useAppStore from './src/state/appStore';
+import { coreMLService } from './src/api/core-ml-service';
+import { localLLMService } from './src/api/local-llm';
+import { logger } from './src/utils/logger';
+
+import './global.css';
+
+function LoadingScreen() {
+    return (
+        <View className="flex-1 justify-center items-center bg-dark-bg">
+            <Text className="text-4xl font-bold text-dark-text mb-4">🧠 monGARS</Text>
+            <ActivityIndicator size="large" color="#3b82f6" />
+            <Text className="text-lg text-dark-text-secondary mt-4 text-center px-8">
+                Initialisation des services IA natifs...
+            </Text>
+            <View className="absolute bottom-12 items-center">
+                <Text className="text-sm text-gray-500">🔒 100% On-Device & Privé</Text>
+            </View>
+        </View>
+    );
+}
+
+function AppContent() {
+    const { settings, loadSettings } = useAppStore();
+    const [isInitialized, setIsInitialized] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const initializeApp = async () => {
+            try {
+                logger.info('App', '🚀 Démarrage de l\'initialisation de l\'application...');
+                
+                await loadSettings();
+                logger.info('App', '✅ Paramètres chargés.');
+
+                await initializeTurboModules();
+                logger.info('App', '✅ TurboModules initialisés.');
+
+                await coreMLService.initialize();
+                logger.info('App', '✅ Service Core ML initialisé.');
+
+                await localLLMService.initialize();
+                logger.info('App', '✅ Service LLM local initialisé.');
+
+                await useAppStore.getState().checkAllServices();
+                logger.info('App', '✅ Vérification des services cloud terminée.');
+
+                setIsInitialized(true);
+                logger.info('App', '🎉 Initialisation de l\'application terminée avec succès !');
+            } catch (e) {
+                const err = e as Error;
+                logger.error('App', '❌ Échec de l\'initialisation de l\'application', err);
+                setError(err.message || 'Une erreur inconnue est survenue.');
+            }
+        };
+
+        initializeApp();
+    }, [loadSettings]);
+
+    if (error) {
+        return (
+            <View className="flex-1 justify-center items-center bg-red-900 p-5">
+                <Text className="text-2xl font-bold text-red-100 mb-4">Erreur d'Initialisation</Text>
+                <Text className="text-center text-red-200">{error}</Text>
+            </View>
+        );
+    }
+
+    if (!isInitialized) {
+        return <LoadingScreen />;
+    }
+
+    return (
+        <NavigationContainer>
+            <StatusBar style={settings.theme === 'dark' ? 'light' : 'dark'} />
+            <AppNavigator />
+        </NavigationContainer>
+    );
+}
+
+export default function App() {
+  return (
+    <ErrorBoundary>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <SafeAreaProvider>
+                <AppContent />
+            </SafeAreaProvider>
+        </GestureHandlerRootView>
+    </ErrorBoundary>
+  );
+}
+
+
+// ====================================================================================
+// ===== End of File: App.tsx =====
+
+// ===== File: src/navigation/AppNavigator.tsx =====
+// ====================================================================================
+import React from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Feather } from '@expo/vector-icons';
+
+import ChatScreen from '../screens/ChatScreen';
+import ModelManagerScreen from '../screens/ModelManagerScreen';
+import SettingsScreen from '../screens/SettingsScreen';
+import useAppStore from '../state/appStore';
+
+const Tab = createBottomTabNavigator();
+
+export function AppNavigator() {
+    const theme = useAppStore((s) => s.settings.theme);
+    const isDark = theme === 'dark';
+
+    return (
+        <Tab.Navigator
+            screenOptions={({ route }) => ({
+                tabBarIcon: ({ focused, color, size }) => {
+                    let iconName: React.ComponentProps<typeof Feather>['name'];
+
+                    if (route.name === 'Chat') {
+                        iconName = 'message-circle';
+                    } else if (route.name === 'Modèles') {
+                        iconName = 'cpu';
+                    } else if (route.name === 'Réglages') {
+                        iconName = 'settings';
+                    } else {
+                        iconName = 'alert-circle'; // Fallback icon
+                    }
+
+                    return <Feather name={iconName} size={size} color={color} />;
+                },
+                tabBarActiveTintColor: isDark ? '#3b82f6' : '#2563eb',
+                tabBarInactiveTintColor: isDark ? '#6b7280' : '#4b5563',
+                tabBarStyle: {
+                    backgroundColor: isDark ? '#1f2937' : '#ffffff',
+                    borderTopColor: isDark ? '#374151' : '#e5e7eb',
+                },
+                headerStyle: {
+                    backgroundColor: isDark ? '#1f2937' : '#ffffff',
+                },
+                headerTitleStyle: {
+                    color: isDark ? '#f9fafb' : '#111827',
+                },
+                headerTitleAlign: 'center',
+            })}
+        >
+            <Tab.Screen name="Chat" component={ChatScreen} />
+            <Tab.Screen name="Modèles" component={ModelManagerScreen} />
+            <Tab.Screen name="Réglages" component={SettingsScreen} />
+        </Tab.Navigator>
+    );
+}
+
+
+// ====================================================================================
+// ===== End of File: src/navigation/AppNavigator.tsx =====
+
+// ===== File: src/screens/ChatScreen.tsx =====
+import React, { useState, useRef, useCallback } from 'react';
+import { View, Text, TextInput, TouchableOpacity, FlatList, KeyboardAvoidingView, Platform } from 'react-native';
+import { Feather } from '@expo/vector-icons';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { MessageBubble } from '../components/MessageBubble';
+import { AIMessage } from '../types/ai';
+import { chatService } from '../api/chat-service';
+import useAppStore from '../state/appStore';
+import { logger } from '../utils/logger';
+
+export default function ChatScreen() {
+    const [messages, setMessages] = useState<AIMessage[]>([]);
+    const [input, setInput] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
+    const flatListRef = useRef<FlatList>(null);
+    const { settings } = useAppStore();
+
+    const handleSend = useCallback(async () => {
+        if (!input.trim() || isGenerating) return;
+        const userInput: AIMessage = { id: `user-${Date.now()}`, role: 'user', content: input.trim(), timestamp: new Date().toISOString() };
+        const conversationHistory = [...messages, userInput];
+        const assistantMessageId = `assistant-${Date.now()}`;
+        const assistantPlaceholder: AIMessage = { id: assistantMessageId, role: 'assistant', content: '', timestamp: new Date().toISOString() };
+
+        setMessages([...conversationHistory, assistantPlaceholder]);
+        setInput(''); setIsGenerating(true);
+        setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
+
+        try {
+            await chatService.streamAIResponse(conversationHistory, settings.defaultProvider, (token) => {
+                setMessages(prev => prev.map(msg =>
+                    msg.id === assistantMessageId ? { ...msg, content: msg.content + token } : msg
+                ));
+            });
+        } catch (error) {
+            logger.error('ChatScreen', 'Erreur de streaming', error);
+            setMessages(prev => prev.map(msg =>
+                msg.id === assistantMessageId
+                    ? { ...msg, content: `Désolé, une erreur est survenue : ${(error as Error).message}`, isError: true }
+                    : msg
+            ));
+        } finally {
+            setIsGenerating(false);
+        }
+    }, [input, isGenerating, settings.defaultProvider, messages]);
+
+    return (
+        <SafeAreaView edges={['bottom']} style={{ flex: 1 }} className="bg-dark-bg">
+            <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }} keyboardVerticalOffset={100}>
+                <View className="flex-1 p-4">
+                    {messages.length === 0 ? (
+                        <View className="flex-1 justify-center items-center">
+                            <Text className="text-2xl font-bold text-dark-text">monGARS</Text>
+                            <Text className="text-dark-text-secondary mt-2">Commencez la conversation</Text>
+                        </View>
+                    ) : (
+                        <FlatList ref={flatListRef} data={messages} renderItem={({ item }) => <MessageBubble message={item} />} keyExtractor={(item) => item.id} contentContainerStyle={{ paddingVertical: 10 }} onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })} />
+                    )}
+                </View>
+                <View className="flex-row items-center p-4 border-t border-dark-border bg-dark-surface">
+                    <TextInput value={input} onChangeText={setInput} placeholder="Écrivez votre message..." placeholderTextColor="#9ca3af" className="flex-1 bg-dark-bg border border-dark-border rounded-full py-3 px-4 text-dark-text" editable={!isGenerating} multiline />
+                    <TouchableOpacity onPress={handleSend} disabled={!input.trim() || isGenerating} className="ml-3 bg-brand-blue p-3 rounded-full">
+                        <Feather name="send" size={24} color="white" />
+                    </TouchableOpacity>
+                </View>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
+    );
+}
+// ===== File: src/screens/ModelManagerScreen.tsx =====
+// ====================================================================================
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert, ScrollView } from 'react-native';
+import { Feather } from '@expo/vector-icons';
+import { coreMLService } from '../api/core-ml-service';
+import { CoreMLModel, DownloadProgressEvent } from '../types/ai';
+import { logger } from '../utils/logger';
+import { NativeEventEmitter } from 'react-native';
+import { TurboModuleRegistry } from '../services/TurboModuleRegistry';
+
+const ModelStatus = ({ model, progressInfo }: { model: CoreMLModel, progressInfo: DownloadProgressEvent | null }) => {
+    if (progressInfo && progressInfo.modelId === model.id) {
+        const { status, progress, error } = progressInfo;
+        let message = '';
+        switch (status) {
+            case 'downloading':
+                message = `Téléchargement... ${Math.round(progress * 100)}%`;
+                break;
+            case 'decompressing':
+                message = 'Décompression...';
+                break;
+            case 'compiling':
+                message = 'Compilation du modèle...';
+                break;
+            case 'error':
+                return <Text className="text-center text-red-400 mt-2">Erreur: {error || 'Inconnue'}</Text>;
+            default:
+                return null;
+        }
+
+        return (
+            <View className="mt-4">
+                <Text className="text-center text-brand-blue mb-2">{message}</Text>
+                <View className="w-full bg-gray-600 rounded-full h-2.5">
+                    <View className="bg-brand-blue h-2.5 rounded-full" style={{ width: `${progress * 100}%` }}></View>
+                </View>
+            </View>
+        );
+    }
+    return null;
+};
+
+
+const ModelItem = ({ model, onAction, isBusy }: { model: CoreMLModel, onAction: (action: 'download' | 'activate' | 'delete', modelId: string) => void, isBusy: boolean }) => {
+    return (
+        <View className="bg-dark-surface p-4 rounded-lg mb-4">
+            <Text className="text-lg font-bold text-dark-text">{model.name}</Text>
+            <Text className="text-sm text-dark-text-secondary mt-1">{model.description}</Text>
+            <View className="flex-row justify-between mt-3">
+                <Text className="text-xs text-gray-400">Taille: {model.sizeMB} Mo</Text>
+                <Text className="text-xs text-gray-400">Contexte: {model.contextLength} tokens</Text>
+            </View>
+
+            <View className="flex-row justify-end mt-4">
+                {!model.isDownloaded ? (
+                    <TouchableOpacity onPress={() => onAction('download', model.id)} disabled={isBusy} className="bg-blue-600 px-4 py-2 rounded-md flex-row items-center">
+                        <Feather name="download" size={16} color="white" />
+                        <Text className="text-white ml-2">Télécharger</Text>
+                    </TouchableOpacity>
+                ) : (
+                    <>
+                        <TouchableOpacity onPress={() => onAction('delete', model.id)} disabled={isBusy} className="bg-red-600 px-4 py-2 rounded-md flex-row items-center mr-2">
+                            <Feather name="trash-2" size={16} color="white" />
+                            <Text className="text-white ml-2">Supprimer</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => onAction('activate', model.id)} disabled={isBusy || model.isActive} className={`${model.isActive ? 'bg-green-700' : 'bg-green-500'} px-4 py-2 rounded-md flex-row items-center`}>
+                            <Feather name={model.isActive ? "check-circle" : "zap"} size={16} color="white" />
+                            <Text className="text-white ml-2">{model.isActive ? 'Actif' : 'Activer'}</Text>
+                        </TouchableOpacity>
+                    </>
+                )}
+            </View>
+        </View>
+    );
+};
+
+export default function ModelManagerScreen() {
+    const [models, setModels] = useState<CoreMLModel[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [progressInfo, setProgressInfo] = useState<DownloadProgressEvent | null>(null);
+    const [availableSpace, setAvailableSpace] = useState<string>('...');
+
+    const isBusy = progressInfo?.status === 'downloading' || progressInfo?.status === 'decompressing' || progressInfo?.status === 'compiling';
+
+    const fetchModels = useCallback(async () => {
+        try {
+            const availableModels = await coreMLService.getAvailableModels();
+            const space = await coreMLService.getAvailableSpace();
+            setModels(availableModels);
+            setAvailableSpace(space);
+        } catch (error) {
+            logger.error('ModelManagerScreen', 'Erreur de récupération des modèles', error);
+            Alert.alert('Erreur', `Impossible de charger les modèles: ${(error as Error).message}`);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchModels();
+
+        const eventEmitter = new NativeEventEmitter(TurboModuleRegistry.LocalLLMModule);
+        const subscription = eventEmitter.addListener('onDownloadProgress', (event: DownloadProgressEvent) => {
+            setProgressInfo(event);
+            if (event.status === 'finished' || event.status === 'activated' || event.status === 'error') {
+                fetchModels(); // Rafraîchir la liste
+                if (event.status !== 'error') {
+                    setTimeout(() => setProgressInfo(null), 2000);
+                }
+            }
+        });
+
+        return () => subscription.remove();
+    }, [fetchModels]);
+
+    const handleAction = async (action: 'download' | 'activate' | 'delete', modelId: string) => {
+        try {
+            switch (action) {
+                case 'download':
+                    await coreMLService.downloadModel(modelId);
+                    break;
+                case 'activate':
+                    await coreMLService.activateModel(modelId);
+                    Alert.alert('Succès', 'Modèle activé.');
+                    break;
+                case 'delete':
+                    await coreMLService.deleteModel(modelId);
+                    Alert.alert('Succès', 'Modèle supprimé.');
+                    break;
+            }
+        } catch (error) {
+            logger.error('ModelManagerScreen', `Erreur lors de l'action ${action}`, error);
+            Alert.alert('Erreur', `L'action a échoué: ${(error as Error).message}`);
+        }
+    };
+
+    if (isLoading) {
+        return <View className="flex-1 justify-center items-center bg-dark-bg"><ActivityIndicator size="large" color="#3b82f6" /></View>;
+    }
+
+    return (
+        <ScrollView className="flex-1 bg-dark-bg p-4">
+             <View className="bg-dark-surface p-4 rounded-lg mb-6">
+                <Text className="text-lg font-bold text-dark-text">Stockage de l'appareil</Text>
+                <Text className="text-dark-text-secondary mt-1">Espace disponible : {availableSpace}</Text>
+            </View>
+            <FlatList
+                data={models}
+                renderItem={({ item }) => (
+                    <View>
+                        <ModelItem 
+                            model={item} 
+                            onAction={handleAction} 
+                            isBusy={isBusy && progressInfo?.modelId === item.id}
+                        />
+                         <ModelStatus model={item} progressInfo={progressInfo} />
+                    </View>
+                )}
+                keyExtractor={(item) => item.id}
+                ListEmptyComponent={() => (
+                    <View className="items-center mt-10">
+                        <Text className="text-dark-text-secondary">Aucun modèle disponible.</Text>
+                        <Text className="text-dark-text-secondary text-center mt-2">Vérifiez votre connexion et le catalogue de modèles.</Text>
+                    </View>
+                )}
+                scrollEnabled={false}
+            />
+        </ScrollView>
+    );
+}
+
+
+// ====================================================================================
+// ===== End of File: src/screens/ModelManagerScreen.tsx =====
+
+// ===== File: src/screens/SettingsScreen.tsx =====
+// ====================================================================================
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Switch } from 'react-native';
+import useAppStore from '../state/appStore';
+import { AIProvider, ServiceStatus } from '../types/ai';
+
+const providers: AIProvider[] = ['local', 'openai', 'anthropic', 'grok'];
+
+const ProviderStatusIndicator = ({ status }: { status: ServiceStatus }) => {
+    const color = status.ok ? 'bg-green-500' : 'bg-red-500';
+    const text = status.ok ? 'Opérationnel' : status.error === 'missing_key' ? 'Clé manquante' : 'Erreur';
+    return (
+        <View className="flex-row items-center">
+            <View className={`w-2.5 h-2.5 rounded-full mr-2 ${color}`} />
+            <Text className="text-sm text-dark-text-secondary">{text}</Text>
+        </View>
+    );
+};
+
+export default function SettingsScreen() {
+    const {
+        settings,
+        serviceStatus,
+        setApiKey,
+        setDefaultProvider,
+        checkAllServices,
+        setTheme,
+        apiKeys,
+        loadSettings
+    } = useAppStore();
+    
+    const [localApiKeys, setLocalApiKeys] = useState(apiKeys);
+    const [isChecking, setIsChecking] = useState(false);
+
+    useEffect(() => {
+        loadSettings();
+    }, [loadSettings]);
+
+    useEffect(() => {
+        setLocalApiKeys(apiKeys);
+    }, [apiKeys]);
+
+    const handleSave = async () => {
+        setIsChecking(true);
+        await setApiKey('openai', localApiKeys.openai);
+        await setApiKey('anthropic', localApiKeys.anthropic);
+        await setApiKey('grok', localApiKeys.grok);
+        await checkAllServices();
+        setIsChecking(false);
+    };
+
+    const handleKeyChange = (provider: 'openai' | 'anthropic' | 'grok', value: string) => {
+        setLocalApiKeys(prev => ({ ...prev, [provider]: value }));
+    };
+
+    return (
+        <ScrollView className="flex-1 bg-dark-bg p-4">
+            <View className="mb-6 p-4 bg-dark-surface rounded-lg">
+                <Text className="text-xl font-bold text-dark-text mb-4">Fournisseur IA par défaut</Text>
+                <View className="flex-row flex-wrap">
+                    {providers.map(p => (
+                        <TouchableOpacity
+                            key={p}
+                            onPress={() => setDefaultProvider(p)}
+                            className={`px-4 py-2 rounded-full mr-2 mb-2 border-2 ${
+                                settings.defaultProvider === p ? 'bg-brand-blue border-brand-blue' : 'border-dark-border'
+                            }`}
+                        >
+                            <Text className={`capitalize font-semibold ${settings.defaultProvider === p ? 'text-white' : 'text-dark-text'}`}>{p}</Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            </View>
+
+            <View className="mb-6 p-4 bg-dark-surface rounded-lg">
+                <Text className="text-xl font-bold text-dark-text mb-4">Clés API des services Cloud</Text>
+                
+                <View className="mb-4">
+                    <View className="flex-row justify-between items-center mb-2">
+                        <Text className="text-lg text-dark-text">OpenAI</Text>
+                        <ProviderStatusIndicator status={serviceStatus.openai} />
+                    </View>
+                    <TextInput
+                        value={localApiKeys.openai}
+                        onChangeText={text => handleKeyChange('openai', text)}
+                        placeholder="sk-..."
+                        secureTextEntry
+                        className="bg-dark-bg border border-dark-border rounded-md p-3 text-dark-text"
+                        placeholderTextColor="#6b7280"
+                    />
+                </View>
+
+                <View className="mb-4">
+                     <View className="flex-row justify-between items-center mb-2">
+                        <Text className="text-lg text-dark-text">Anthropic</Text>
+                        <ProviderStatusIndicator status={serviceStatus.anthropic} />
+                    </View>
+                    <TextInput
+                        value={localApiKeys.anthropic}
+                        onChangeText={text => handleKeyChange('anthropic', text)}
+                        placeholder="sk-ant-..."
+                        secureTextEntry
+                        className="bg-dark-bg border border-dark-border rounded-md p-3 text-dark-text"
+                        placeholderTextColor="#6b7280"
+                    />
+                </View>
+                
+                <View className="mb-4">
+                     <View className="flex-row justify-between items-center mb-2">
+                        <Text className="text-lg text-dark-text">Grok (xAI)</Text>
+                        <ProviderStatusIndicator status={serviceStatus.grok} />
+                    </View>
+                    <TextInput
+                        value={localApiKeys.grok}
+                        onChangeText={text => handleKeyChange('grok', text)}
+                        placeholder="xai-..."
+                        secureTextEntry
+                        className="bg-dark-bg border border-dark-border rounded-md p-3 text-dark-text"
+                        placeholderTextColor="#6b7280"
+                    />
+                </View>
+
+                <TouchableOpacity onPress={handleSave} disabled={isChecking} className="bg-brand-blue rounded-md p-4 flex-row justify-center items-center mt-2">
+                    {isChecking ? <ActivityIndicator color="white" /> : <Text className="text-white text-lg font-bold">Enregistrer et Vérifier</Text>}
+                </TouchableOpacity>
+            </View>
+
+            <View className="p-4 bg-dark-surface rounded-lg">
+                <Text className="text-xl font-bold text-dark-text mb-4">Apparence</Text>
+                <View className="flex-row justify-between items-center">
+                    <Text className="text-lg text-dark-text">Thème sombre</Text>
+                    <Switch
+                        value={settings.theme === 'dark'}
+                        onValueChange={(value) => setTheme(value ? 'dark' : 'light')}
+                        trackColor={{ false: "#767577", true: "#3b82f6" }}
+                        thumbColor={settings.theme === 'dark' ? "#f4f3f4" : "#f4f3f4"}
+                    />
+                </View>
+            </View>
+        </ScrollView>
+    );
+}
+
+
+// ====================================================================================
+// ===== End of File: src/screens/SettingsScreen.tsx =====
+
+// ===== File: src/components/MessageBubble.tsx =====
+// ====================================================================================
+import React from 'react';
+import { View, Text } from 'react-native';
+import { Feather } from '@expo/vector-icons';
+import { AIMessage } from '../types/ai';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+
+interface MessageBubbleProps {
+    message: AIMessage;
+}
+
+export function MessageBubble({ message }: MessageBubbleProps) {
+    const isUser = message.role === 'user';
+    
+    const bubbleStyle = isUser
+        ? 'bg-brand-blue self-end'
+        : message.isError ? 'bg-red-500 self-start' : 'bg-dark-surface self-start';
+    
+    const textStyle = isUser ? 'text-white' : 'text-dark-text';
+
+    return (
+        <View className={`my-2 max-w-[85%] rounded-2xl p-3 ${bubbleStyle}`}>
+            {message.isError && (
+                 <View className="flex-row items-center mb-1">
+                    <Feather name="alert-triangle" size={16} color="#fecaca" />
+                    <Text className="ml-2 font-bold text-red-100">Erreur</Text>
+                </View>
+            )}
+            <Text className={`text-base ${textStyle}`}>{message.content}</Text>
+            <Text className={`text-xs mt-2 self-end ${isUser ? 'text-blue-200' : 'text-dark-text-secondary'}`}>
+                {format(new Date(message.timestamp), 'HH:mm', { locale: fr })}
+            </Text>
+        </View>
+    );
+}
+
+
+// ====================================================================================
+// ===== End of File: src/components/MessageBubble.tsx =====
+
+// ===== File: src/components/ErrorBoundary.tsx =====
+// ====================================================================================
+import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import * as Updates from 'expo-updates';
+import { logger } from '../utils/logger';
+
+interface Props {
+  children: ReactNode;
+}
+
+interface State {
+  hasError: boolean;
+  error?: Error;
+}
+
+export class ErrorBoundary extends Component<Props, State> {
+  public state: State = {
+    hasError: false,
+  };
+
+  public static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
+  }
+
+  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    logger.error('ErrorBoundary', 'Uncaught error:', { error: error.toString(), stack: errorInfo.componentStack });
+  }
+  
+  private handleReload = () => {
+      Updates.reloadAsync();
+  }
+
+  public render() {
+    if (this.state.hasError) {
+      return (
+        <View className="flex-1 justify-center items-center bg-red-900 p-5">
+            <Text className="text-2xl font-bold text-red-100 mb-4">Oops! Une erreur est survenue.</Text>
+            <Text className="text-center text-red-200 mb-6">L'application a rencontré un problème inattendu. Vous pouvez essayer de la recharger.</Text>
+            <TouchableOpacity onPress={this.handleReload} className="bg-red-500 px-6 py-3 rounded-lg">
+                <Text className="text-white font-bold text-lg">Recharger l'application</Text>
+            </TouchableOpacity>
+             <ScrollView className="mt-6 bg-red-800 p-3 rounded-md w-full max-h-60">
+                <Text className="text-red-200 font-mono">{this.state.error?.toString()}</Text>
+            </ScrollView>
+        </View>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+
+// ====================================================================================
+// ===== End of File: src/components/ErrorBoundary.tsx =====
+
+// ===== File: src/api/chat-service.ts =====
+import { AIMessage, AIProvider } from '../types/ai';
+import { localLLMService } from './local-llm';
+import { getOpenAIStream } from './openai';
+import { getAnthropicStream } from './anthropic';
+import { getGrokStream } from './grok';
+import useAppStore from '../state/appStore';
+import { logger } from '../utils/logger';
+
+class ChatService {
+    public async streamAIResponse(messages: AIMessage[], provider: AIProvider, onToken: (token: string) => void): Promise<void> {
+        logger.info('ChatService', `Demande de stream IA au fournisseur: ${provider}`);
+        const { apiKeys } = useAppStore.getState();
+        try {
+            switch (provider) {
+                case 'local': return await localLLMService.streamResponse(messages, onToken);
+                case 'openai':
+                    if (!apiKeys.openai) throw new Error('Clé API OpenAI manquante.');
+                    return await getOpenAIStream(messages, apiKeys.openai, onToken);
+                case 'anthropic':
+                    if (!apiKeys.anthropic) throw new Error('Clé API Anthropic manquante.');
+                    return await getAnthropicStream(messages, apiKeys.anthropic, onToken);
+                case 'grok':
+                    if (!apiKeys.grok) throw new Error('Clé API Grok manquante.');
+                    return await getGrokStream(messages, apiKeys.grok, onToken);
+                default: throw new Error(`Fournisseur inconnu: ${provider}`);
+            }
+        } catch (error) {
+            logger.error('ChatService', `Erreur de streaming avec le fournisseur ${provider}`, error);
+            throw error;
+        }
+    }
+}
+export const chatService = new ChatService();
+
+
+// ===== File: src/api/core-ml-service.ts =====
+// ====================================================================================
+import { TurboModuleRegistry } from '../services/TurboModuleRegistry';
+import { CoreMLModel } from '../types/ai';
+import { logger } from '../utils/logger';
+
+class CoreMLService {
+    private module = TurboModuleRegistry.LocalLLMModule;
+
+    public async initialize(): Promise<void> {
+        logger.info('CoreMLService', 'Initialisation du service CoreML.');
+        return Promise.resolve();
+    }
+
+    public getAvailableModels(): Promise<CoreMLModel[]> {
+        logger.info('CoreMLService', 'Récupération des modèles disponibles...');
+        return this.module.getAvailableModels();
+    }
+
+    public downloadModel(modelId: string): Promise<void> {
+        logger.info('CoreMLService', `Lancement du téléchargement pour le modèle: ${modelId}`);
+        return this.module.downloadModel(modelId);
+    }
+
+    public activateModel(modelId: string): Promise<void> {
+        logger.info('CoreMLService', `Activation du modèle: ${modelId}`);
+        return this.module.loadModel(modelId);
+    }
+
+    public deleteModel(modelId: string): Promise<void> {
+        logger.info('CoreMLService', `Suppression du modèle: ${modelId}`);
+        return this.module.deleteModel(modelId);
+    }
+    
+    public cancelDownload(modelId: string): Promise<void> {
+        logger.info('CoreMLService', `Annulation du téléchargement pour: ${modelId}`);
+        return this.module.cancelDownload(modelId);
+    }
+
+    public generateText(prompt: string): Promise<string> {
+        logger.info('CoreMLService', 'Génération de texte avec le modèle local actif...');
+        return this.module.generateText(prompt, 512, 0.7, 0.9);
+    }
+    
+    public getAvailableSpace(): Promise<string> {
+        logger.info('CoreMLService', 'Récupération de l\'espace disque disponible...');
+        return this.module.getAvailableSpace();
+    }
+}
+
+export const coreMLService = new CoreMLService();
+
+
+// ====================================================================================
+// ===== End of File: src/api/core-ml-service.ts =====
+
+// ===== File: src/api/local-llm.ts =====
+import { coreMLService } from './core-ml-service';
+import { logger } from '../utils/logger';
+import { AIMessage } from '../types/ai';
+import { NativeEventEmitter } from 'react-native';
+import { TurboModuleRegistry } from '../services/TurboModuleRegistry';
+
+class LocalLLMService {
+    private isReady = false;
+
+    public async initialize(): Promise<void> {
+        this.isReady = true;
+    }
+
+    public streamResponse(messages: AIMessage[], onToken: (token: string) => void): Promise<void> {
+        if (!this.isReady) {
+            throw new Error('Le service LLM local n\'est pas prêt.');
+        }
+
+        return new Promise((resolve, reject) => {
+            const eventEmitter = new NativeEventEmitter(TurboModuleRegistry.LocalLLMModule);
+            const tokenListener = eventEmitter.addListener('onGeneratedToken', (event: { token: string }) => onToken(event.token));
+            const endListener = eventEmitter.addListener('onGenerationEnd', (event?: { error?: string }) => {
+                tokenListener.remove(); endListener.remove();
+                event?.error ? reject(new Error(event.error)) : resolve();
+            });
+
+            coreMLService.generateStream(messages).catch(err => {
+                tokenListener.remove(); endListener.remove(); reject(err);
+            });
+        });
+    }
+}
+
+export const localLLMService = new LocalLLMService();
+
+
+// ===== File: src/api/openai.ts =====
+// ====================================================================================
+import OpenAI from 'openai';
+import { logger } from '../utils/logger';
+
+export async function checkOpenAIService(apiKey: string): Promise<void> {
+    if (!apiKey) throw new Error('missing_key');
+    try {
+        const openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
+        await openai.models.list({ limit: 1 });
+        logger.info('OpenAI', 'La clé API OpenAI est valide.');
+    } catch (error) {
+        logger.warn('OpenAI', 'La vérification de la clé API OpenAI a échoué.', error);
+        throw new Error('Clé invalide ou problème réseau.');
+    }
+}
+
+export async function getOpenAIChatCompletion(messages: AIMessage[], apiKey: string): Promise<string> { // <-- patched
+    const openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
+    const completion = await openai.chat.completions.create({
+        messages: messages.map((msg) => ({ role: msg.role, content: msg.content })), // <-- patched
+        model: 'gpt-4o-mini',
+    });
+
+    const content = completion.choices[0]?.message?.content;
+    if (!content) {
+        throw new Error('Réponse vide de l\'API OpenAI.');
+    }
+    return content;
+}
+
+
+// ====================================================================================
+// ===== End of File: src/api/openai.ts =====
+
+// ===== File: src/api/anthropic.ts =====
+// ====================================================================================
+import Anthropic from '@anthropic-ai/sdk';
+import { logger } from '../utils/logger';
+
+export async function checkAnthropicService(apiKey: string): Promise<void> {
+    if (!apiKey) throw new Error('missing_key');
+    try {
+        if (!apiKey.startsWith('sk-ant-')) {
+            throw new Error('Format de clé invalide.');
+        }
+        logger.info('Anthropic', 'La clé API Anthropic a un format valide.');
+    } catch (error) {
+        logger.warn('Anthropic', 'La vérification de la clé API Anthropic a échoué.', error);
+        throw new Error('Clé invalide ou problème réseau.');
+    }
+}
+
+export async function getAnthropicChatCompletion(messages: AIMessage[], apiKey: string): Promise<string> { // <-- patched
+    const anthropic = new Anthropic({ apiKey });
+    const response = await anthropic.messages.create({
+        model: "claude-3-haiku-20240307",
+        max_tokens: 1024,
+        messages: messages.map((msg) => ({ role: msg.role, content: msg.content })), // <-- patched
+    });
+    
+    if (response.content[0]?.type === 'text') {
+        return response.content[0].text;
+    }
+    throw new Error('Réponse inattendue de l\'API Anthropic.');
+}
+
+
+// ====================================================================================
+// ===== End of File: src/api/anthropic.ts =====
+
+// ===== File: src/api/grok.ts =====
+// ====================================================================================
+import OpenAI from 'openai';
+import { logger } from '../utils/logger';
+
+export async function checkGrokService(apiKey: string): Promise<void> {
+    if (!apiKey) throw new Error('missing_key');
+    try {
+        const grok = new OpenAI({
+            apiKey,
+            baseURL: 'https://api.x.ai/v1',
+            dangerouslyAllowBrowser: true,
+        });
+        await grok.models.list();
+        logger.info('Grok', 'La clé API Grok est valide.');
+    } catch (error) {
+        logger.warn('Grok', 'La vérification de la clé API Grok a échoué.', error);
+        throw new Error('Clé invalide ou problème réseau.');
+    }
+}
+
+export async function getGrokChatCompletion(messages: AIMessage[], apiKey: string): Promise<string> { // <-- patched
+    const grok = new OpenAI({
+        apiKey,
+        baseURL: 'https://api.x.ai/v1',
+        dangerouslyAllowBrowser: true,
+    });
+
+    const completion = await grok.chat.completions.create({
+        messages: messages.map((msg) => ({ role: msg.role, content: msg.content })), // <-- patched
+        model: 'grok-1.5-flash',
+    });
+
+    const content = completion.choices[0]?.message?.content;
+    if (!content) {
+        throw new Error('Réponse vide de l\'API Grok.');
+    }
+    return content;
+}
+
+
+// ====================================================================================
+// ===== End of File: src/api/grok.ts =====
+
+// ===== File: src/services/TurboModuleRegistry.ts =====
+// ====================================================================================
+import { NativeModules, Platform } from 'react-native';
+import type { Spec } from '../types/MonGARSTurboModules';
+import { logger } from '../utils/logger';
+
+interface LocalLLMModuleSpec extends Spec {}
+
+const createProxy = (): LocalLLMModuleSpec => {
+    logger.warn('TurboModuleRegistry', 'Le TurboModule natif "LocalLLMModule" n\'est pas disponible. Utilisation d\'un proxy.');
+    
+    const unsupported = () => Promise.reject(new Error('Le module natif n\'est pas supporté sur cette plateforme ou dans cette build.'));
+    
+    return new Proxy({}, {
+        get(_, prop) {
+            if (prop === 'getAvailableModels') return () => Promise.resolve([]);
+            if (prop === 'getAvailableSpace') return () => Promise.resolve('N/A');
+            if (prop === 'generateText') return () => Promise.resolve('Mode local non disponible.');
+            if (prop === 'addListener' || prop === 'removeListeners') return () => {};
+            return unsupported;
+        }
+    }) as LocalLLMModuleSpec;
+};
+
+const LocalLLMModule = NativeModules.LocalLLMModule
+  ? (NativeModules.LocalLLMModule as LocalLLMModuleSpec)
+  : createProxy();
+
+export const TurboModuleRegistry = {
+    LocalLLMModule,
+};
+
+export function initializeTurboModules(): Promise<void> {
+    return new Promise((resolve) => {
+        if (NativeModules.LocalLLMModule) {
+            logger.info('TurboModuleRegistry', 'TurboModule "LocalLLMModule" chargé avec succès.');
+        }
+        resolve();
+    });
+}
+
+
+// ====================================================================================
+// ===== End of File: src/services/TurboModuleRegistry.ts =====
+
+// ===== File: src/state/appStore.ts =====
+// ====================================================================================
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import * as SecureStore from 'expo-secure-store';
+import { AIProvider, ServiceStatus, ApiKeys } from '../types/ai';
+import { checkOpenAIService } from '../api/openai';
+import { checkAnthropicService } from '../api/anthropic';
+import { checkGrokService } from '../api/grok';
+import { logger } from '../utils/logger';
+
+interface AppSettings {
+    theme: 'light' | 'dark';
+    defaultProvider: AIProvider;
+}
+
+interface AppState {
+    settings: AppSettings;
+    apiKeys: ApiKeys;
+    serviceStatus: Record<AIProvider, ServiceStatus>;
+    setTheme: (theme: 'light' | 'dark') => void;
+    setDefaultProvider: (provider: AIProvider) => void;
+    setApiKey: (provider: keyof ApiKeys, key: string) => Promise<void>;
+    loadSettings: () => Promise<void>;
+    checkService: (provider: AIProvider) => Promise<void>;
+    checkAllServices: () => Promise<void>;
+}
+
+const initialApiKeys: ApiKeys = {
+    openai: '',
+    anthropic: '',
+    grok: '',
+};
+
+const initialServiceStatus: ServiceStatus = { ok: false, error: 'unchecked' };
+
+const useAppStore = create<AppState>()(
+    persist(
+        (set, get) => ({
+            settings: {
+                theme: 'dark',
+                defaultProvider: 'local',
+            },
+            apiKeys: initialApiKeys,
+            serviceStatus: {
+                local: { ok: true, error: null },
+                openai: initialServiceStatus,
+                anthropic: initialServiceStatus,
+                grok: initialServiceStatus,
+            },
+            setTheme: (theme) => set(state => ({ settings: { ...state.settings, theme } })),
+            setDefaultProvider: (provider) => set(state => ({ settings: { ...state.settings, defaultProvider: provider } })),
+            setApiKey: async (provider, key) => {
+                set(state => ({
+                    apiKeys: { ...state.apiKeys, [provider]: key },
+                }));
+            },
+            loadSettings: async () => {
+                logger.info('appStore', 'Les paramètres et clés API ont été chargés depuis AsyncStorage.');
+                get().checkAllServices();
+            },
+            checkService: async (provider) => {
+                const { apiKeys } = get();
+                let status: ServiceStatus = { ok: false, error: 'unknown' };
+                const apiKey = apiKeys[provider as keyof ApiKeys];
+
+                if (!apiKey) {
+                    status = { ok: false, error: 'missing_key' };
+                } else {
+                    try {
+                        switch (provider) {
+                            case 'openai':
+                                await checkOpenAIService(apiKey);
+                                status = { ok: true, error: null };
+                                break;
+                            case 'anthropic':
+                                await checkAnthropicService(apiKey);
+                                status = { ok: true, error: null };
+                                break;
+                            case 'grok':
+                                await checkGrokService(apiKey);
+                                status = { ok: true, error: null };
+                                break;
+                            case 'local':
+                                status = { ok: true, error: null };
+                                break;
+                        }
+                    } catch (e) {
+                         const err = e as Error;
+                         logger.warn('appStore', `Échec de la vérification du service ${provider}`, err);
+                         status = { ok: false, error: err.message };
+                    }
+                }
+                set(state => ({
+                    serviceStatus: { ...state.serviceStatus, [provider]: status },
+                }));
+            },
+            checkAllServices: async () => {
+                logger.info('appStore', 'Vérification de tous les services cloud...');
+                const { checkService } = get();
+                await Promise.all([
+                    checkService('openai'),
+                    checkService('anthropic'),
+                    checkService('grok'),
+                ]);
+                logger.info('appStore', 'Vérification de tous les services terminée.');
+            },
+        }),
+        {
+            name: 'monGARS-storage',
+            storage: {
+                getItem: async (key) => SecureStore.getItemAsync(key),
+                setItem: async (key, value) => SecureStore.setItemAsync(key, value),
+                removeItem: async (key) => SecureStore.deleteItemAsync(key)
+            },
+            partialize: (state) => ({
+                settings: state.settings,
+                apiKeys: state.apiKeys,
+            }),
+        }
+    )
+);
+
+export default useAppStore;
+
+
+// ====================================================================================
+// ===== End of File: src/state/appStore.ts =====
+
+// ===== File: src/types/ai.ts =====
+// ====================================================================================
+export type AIProvider = 'local' | 'openai' | 'anthropic' | 'grok';
+
+export interface AIMessage {
+    id: string;
+    role: 'user' | 'assistant';
+    content: string;
+    timestamp: string;
+    isError?: boolean;
+}
+
+export interface ApiKeys {
+    openai: string;
+    anthropic: string;
+    grok: string;
+}
+
+export interface ServiceStatus {
+    ok: boolean;
+    error: string | null;
+}
+
+export interface CoreMLModel {
+    id: string;
+    name: string;
+    description: string;
+    sizeMB: number;
+    contextLength: number;
+    isDownloaded: boolean;
+    isActive: boolean;
+    url: string;
+}
+
+export interface DownloadProgressEvent {
+    modelId: string;
+    progress: number; // 0.0 to 1.0
+    status: 'downloading' | 'decompressing' | 'compiling' | 'finished' | 'activated' | 'error' | 'cancelled';
+    error?: string;
+}
+
+
+// ====================================================================================
+// ===== End of File: src/types/ai.ts =====
+
+// ===== File: src/types/MonGARSTurboModules.ts =====
+import type { TurboModule } from 'react-native';
+import { Int32 } from 'react-native/Libraries/Types/CodegenTypes';
+import { CoreMLModel, AIMessage } from './ai';
+
+type NativeAIMessage = Omit<AIMessage, 'id' | 'timestamp' | 'isError'>;
+
+export interface Spec extends TurboModule {
+    getAvailableModels(): Promise<CoreMLModel[]>;
+    downloadModel(modelId: string): Promise<void>;
+    loadModel(modelId: string): Promise<void>;
+    deleteModel(modelId: string): Promise<void>;
+    cancelDownload(modelId: string): Promise<void>;
+    generateStream(messages: NativeAIMessage[]): Promise<void>;
+    getAvailableSpace(): Promise<string>;
+    addListener(eventName: string): void;
+    removeListeners(count: Int32): void;
+}
+
+
+// ===== File: src/utils/logger.ts =====
+// ====================================================================================
+const LOG_LEVELS = {
+  error: 0,
+  warn: 1,
+  info: 2,
+  debug: 3,
+};
+
+const CURRENT_LOG_LEVEL = 'debug';
+
+const log = (level: keyof typeof LOG_LEVELS, source: string, message: string, data?: any) => {
+  if (LOG_LEVELS[level] > LOG_LEVELS[CURRENT_LOG_LEVEL]) {
+    return;
+  }
+
+  const now = new Date().toISOString();
+  const colorMap = {
+    error: '\x1b[31m',
+    warn: '\x1b[33m',
+    info: '\x1b[36m',
+    debug: '\x1b[35m',
+  };
+
+  console.log(
+    `${colorMap[level]}[${now}] [${level.toUpperCase()}] [${source}] - ${message}`,
+    data ? JSON.stringify(data, null, 2) : ''
+  );
+};
+
+export const logger = {
+  error: (source: string, message: string, error?: any) => log('error', source, message, error),
+  warn: (source: string, message: string, data?: any) => log('warn', source, message, data),
+  info: (source: string, message: string, data?: any) => log('info', source, message, data),
+  debug: (source: string, message: string, data?: any) => log('debug', source, message, data),
+};
+
+
+// ====================================================================================
+// ===== End of File: src/utils/logger.ts =====
+
+// ===== File: ios/MonGARSTurboModules.m =====
+#import <React/RCTBridgeModule.h>
+#import <React/RCTEventEmitter.h>
+#import "mongars-Swift.h"
+
+@interface RCT_EXTERN_MODULE(LocalLLMModule, RCTEventEmitter)
+
+RCT_EXTERN_METHOD(getAvailableModels:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(downloadModel:(NSString*)modelId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(loadModel:(NSString*)modelId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(deleteModel:(NSString*)modelId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(cancelDownload:(NSString*)modelId resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(generateStream:(NSArray*)messages resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getAvailableSpace:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+
+@end
+
+
+// ===== File: ios/ModelDownloader.swift =====
+import Foundation
+
+protocol ModelDownloaderDelegate: AnyObject {
+    func downloadDidUpdate(modelId: String, progress: Float)
+    func downloadDidFinish(modelId: String, at location: URL)
+    func downloadDidFail(modelId: String, error: Error)
+}
+
+class ModelDownloader: NSObject, URLSessionDownloadDelegate {
+    weak var delegate: ModelDownloaderDelegate?
+    private var activeDownloads: [String: URLSessionDownloadTask] = [:]
+
+    private lazy var urlSession: URLSession = {
+        let identifier = "com.mongars.ai.backgroundModelDownloader"
+        let config = URLSessionConfiguration.background(withIdentifier: identifier)
+        config.isDiscretionary = false
+        config.sessionSendsLaunchEvents = true
+        return URLSession(configuration: config, delegate: self, delegateQueue: nil)
+    }()
+
+    func startDownload(modelId: String, url: URL) {
+        let task = urlSession.downloadTask(with: url)
+        task.taskDescription = modelId
+        task.resume()
+        activeDownloads[modelId] = task
+    }
+
+    func cancelDownload(modelId: String) {
+        activeDownloads[modelId]?.cancel()
+        activeDownloads.removeValue(forKey: modelId)
+    }
+
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+        guard let modelId = downloadTask.taskDescription else { return }
+        delegate?.downloadDidFinish(modelId: modelId, at: location)
+        activeDownloads.removeValue(forKey: modelId)
+    }
+
+    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask,
+                    didWriteData bytesWritten: Int64,
+                    totalBytesWritten: Int64,
+                    totalBytesExpectedToWrite: Int64) {
+        guard let modelId = downloadTask.taskDescription, totalBytesExpectedToWrite > 0 else { return }
+        let progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
+        delegate?.downloadDidUpdate(modelId: modelId, progress: progress)
+    }
+
+    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        guard let modelId = task.taskDescription else { return }
+        if let error = error, (error as NSError).code != NSURLErrorCancelled {
+            delegate?.downloadDidFail(modelId: modelId, error: error)
+        }
+        activeDownloads.removeValue(forKey: modelId)
+    }
+}
+
+
+// ===== File: ios/LocalLLMModule.swift =====
+import Foundation
+import CoreML
+import MLX
+import MLXFast
+import Tokenizers
+import SWCompression
+
+@objc(LocalLLMModule)
+class LocalLLMModule: RCTEventEmitter, ModelDownloaderDelegate {
+
+    private let downloader = ModelDownloader()
+    private var hasListeners = false
+    private var activeModel: MLModel? = nil
+    private var tokenizer: Tokenizer? = nil
+
+    override init() {
+        super.init()
+        downloader.delegate = self
+    }
+
+    override func supportedEvents() -> [String]! {
+        return ["onDownloadProgress", "onGeneratedToken", "onGenerationEnd"]
+    }
+
+    override func startObserving() { hasListeners = true }
+    override func stopObserving() { hasListeners = false }
+
+    private func sendEvent(withName name: String, body: Any?) {
+        if hasListeners {
+            self.sendEvent(withName: name, body: body)
+        }
+    }
+
+    func downloadDidUpdate(modelId: String, progress: Float) {
+        sendEvent(withName: "onDownloadProgress", body: ["modelId": modelId, "progress": progress])
+    }
+    func downloadDidFinish(modelId: String, at location: URL) {
+        sendEvent(withName: "onDownloadProgress", body: ["modelId": modelId, "progress": 1.0])
+    }
+    func downloadDidFail(modelId: String, error: Error) {
+        sendEvent(withName: "onGenerationEnd", body: ["error": error.localizedDescription])
+    }
+
+    private func applyChatTemplate(messages: [[String: String]]) -> String {
+        var prompt = "<|begin_of_text|>"
+        for message in messages {
+            guard let role = message["role"], let content = message["content"] else { continue }
+            prompt += "<|start_header_id|>\(role)<|end_header_id|>\n\n\(content)<|eot_id|>"
+        }
+        prompt += "<|start_header_id|>assistant<|end_header_id|>\n\n"
+        return prompt
+    }
+
+    @objc(generateStream:resolver:rejecter:)
+    func generateStream(messages: [[String: String]], resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+        guard let model = activeModel, self.tokenizer != nil else {
+            let errorMsg = "Aucun modèle n'est actif."
+            self.sendEvent(withName: "onGenerationEnd", body: ["error": errorMsg])
+            reject("no_model_active", errorMsg, nil); return
+        }
+
+        resolve(nil)
+
+        Task(priority: .userInitiated) {
+            do {
+                let prompt = self.applyChatTemplate(messages: messages)
+                let stream = model.generate(prompt: prompt, temp: 0.7) { token in
+                    self.sendEvent(withName: "onGeneratedToken", body: ["token": token])
+                }
+                _ = try await stream.map { $0 }.joined()
+                self.sendEvent(withName: "onGenerationEnd", body: nil)
+            } catch {
+                let errorMsg = "La génération de texte a échoué: \(error.localizedDescription)"
+                self.sendEvent(withName: "onGenerationEnd", body: ["error": errorMsg])
+            }
+        }
+    }
+}
+
+
+// ===== File: __tests__/chat-service.test.ts =====
+// ====================================================================================
+import { chatService } from '../src/api/chat-service';
+import { AIMessage } from '../src/types/ai';
+
+describe('ChatService', () => {
+  it('handles local provider response', async () => {
+    const messages: AIMessage[] = [{
+      id: '1',
+      role: 'user',
+      content: 'Hello',
+      timestamp: new Date().toISOString()
+    }];
+    const response = await chatService.getAIResponse(messages, 'local');
+    expect(response.role).toBe('assistant');
+    expect(typeof response.content).toBe('string');
+  });
+});
+
+// ==== FIN DU FICHIER DE CODEBASE COMPLET
+
+// ===== End of File: {label} =====
+
+// ===== File: models.json =====
+
+[
+  {
+    "id": "llama-3.2-3b-instruct",
+    "name": "Llama 3.2 3B Instruct (andmev)",
+    "description": "Optimized LLaMA 3.2 model for Core ML on-device inference.",
+    "sizeMB": 4200,
+    "contextLength": 2048,
+    "url": "https://huggingface.co/andmev/Llama-3.2-3B-Instruct-CoreML/resolve/main/llama-3.2-3b.mlpackage.tar"
+  },
+  {
+    "id": "mistral-coreml",
+    "name": "Mistral Core ML (Apple)",
+    "description": "Apple-optimized Mistral model converted to Core ML format.",
+    "sizeMB": 3900,
+    "contextLength": 4096,
+    "url": "https://huggingface.co/apple/mistral-coreml/resolve/main/Mistral7BInstruct.mlpackage.tar"
+  },
+  {
+    "id": "mixtral-coreml",
+    "name": "Mixtral 8x7B (CoreML-Community)",
+    "description": "Mixture of Experts LLM optimized for iOS Core ML execution.",
+    "sizeMB": 6700,
+    "contextLength": 8192,
+    "url": "https://huggingface.co/coreml-community/mixtral-8x7b/resolve/main/Mixtral8x7B.mlpackage.tar"
+  }
+]
+
+// ===== End of File: {label} =====
+
+// ===== File: Podfile =====
+
+platform :ios, '14.0'
+
+require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
+target 'monGARS' do
+  config = use_native_modules!
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    :hermes_enabled => true,
+    :fabric_enabled => true,
+    :app_path => "../"
+  )
+
+  pod 'ExpoModulesCore'
+  pod 'RNPermissions', :path => '../node_modules/react-native-permissions'
+
+  # Add Core ML / MLX / Tokenizers dependencies if needed
+  pod 'swift-tokenizers', :git => 'https://github.com/huggingface/swift-tokenizers.git'
+  pod 'SWCompression', :git => 'https://github.com/tsolomko/SWCompression.git'
+
+  target 'monGARSTests' do
+    inherit! :complete
+    # Pods for testing
+  end
+
+  post_install do |installer|
+    react_native_post_install(installer)
+  end
+end
+
+// ===== End of File: {label} =====
+
+// ===== File: validate-package.js =====
+
+const fs = require('fs');
+const requiredDeps = ['expo', 'react-native', 'openai', '@anthropic-ai/sdk', 'zustand'];
+
+const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+
+let missing = requiredDeps.filter(dep => !pkg.dependencies || !pkg.dependencies[dep]);
+
+if (missing.length > 0) {
+  console.error('❌ Missing dependencies:', missing.join(', '));
+  process.exit(1);
+} else {
+  console.log('✅ All required dependencies are present.');
+}
+
+// ===== End of File: {label} =====
+
+// ===== File: InfoPermissions.plist =====
+
+<key>NSMicrophoneUsageDescription</key>
+<string>L'application a besoin d'accéder au microphone pour la reconnaissance vocale.</string>
+<key>NSSpeechRecognitionUsageDescription</key>
+<string>L'application utilise la reconnaissance vocale pour convertir votre voix en texte.</string>
+<key>NSCameraUsageDescription</key>
+<string>L'application a besoin de la caméra pour la reconnaissance optique de caractères (OCR).</string>
+
+// ===== End of File: {label} =====
+
+// ===== File: eas.json =====
+
+cli:
+  version: >= 7.6.0
+
+build:
+  development:
+    developmentClient: true
+    distribution: internal
+    ios:
+      resourceClass: m1-medium
+  preview:
+    distribution: internal
+    ios:
+      resourceClass: m1-medium
+      image: latest
+  production:
+    ios:
+      resourceClass: m1-medium
+      image: latest
+      autoIncrement: true
+
+submit:
+  production:
+    ios:
+      appleId: YOUR_APPLE_ID_HERE
+      ascAppId: YOUR_APP_STORE_CONNECT_APP_ID
+
+// ===== End of File: {label} =====
+
+// ===== File: app.config.js =====
+
+import 'dotenv/config';
+
+export default {
+  expo: {
+    name: process.env.APP_NAME || "monGARS",
+    slug: process.env.APP_SLUG || "monGARS",
+    version: "1.0.0",
+    orientation: "portrait",
+    icon: "./assets/icon.png",
+    splash: {
+      image: "./assets/splash.png",
+      resizeMode: "contain",
+      backgroundColor: "#111827"
+    },
+    ios: {
+      supportsTablet: true,
+      bundleIdentifier: "com.mongars.ai",
+      buildNumber: "1.0.0",
+      infoPlist: {
+        NSMicrophoneUsageDescription: "L'application a besoin d'accéder au microphone pour la reconnaissance vocale.",
+        NSSpeechRecognitionUsageDescription: "L'application utilise la reconnaissance vocale pour convertir votre voix en texte.",
+        NSCameraUsageDescription: "L'application a besoin de la caméra pour la reconnaissance optique de caractères (OCR)."
+      }
+    },
+    android: {
+      adaptiveIcon: {
+        foregroundImage: "./assets/adaptive-icon.png",
+        backgroundColor: "#111827"
+      },
+      package: "com.mongars.ai"
+    },
+    plugins: [
+      ["expo-build-properties", {
+        ios: { useFrameworks: "static", newArchEnabled: true },
+        android: { newArchEnabled: true }
+      }]
+    ]
+  }
+};
+
+// ===== End of File: {label} =====
+
+// ===== File: .env.example =====
+
+# === API KEYS ===
+EXPO_PUBLIC_VIBECODE_OPENAI_API_KEY=sk-...
+EXPO_PUBLIC_VIBECODE_ANTHROPIC_API_KEY=sk-ant-...
+EXPO_PUBLIC_VIBECODE_GROK_API_KEY=xai-...
+EXPO_PUBLIC_VIBECODE_GOOGLE_API_KEY=AIza...
+EXPO_PUBLIC_VIBECODE_ELEVENLABS_API_KEY=elevenlabs-...
+
+# === APP CONFIG ===
+APP_NAME=monGARS
+APP_SLUG=monGARS
+
+// ===== End of File: {label} =====
+
+// ===== File: .gitignore =====
+
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
+ios/Pods/
+
+# Expo & React Native
+.expo/
+.expo-shared/
+*.log
+*.lock
+*.tmp
+*.keystore
+
+# macOS
+.DS_Store
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Xcode
+ios/build/
+ios/DerivedData/
+
+# JetBrains
+.idea/
+
+// ===== End of File: {label} =====
+
+// ===== File: .github/workflows/ci_ios_build.yml =====
+
+name: EAS Build
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build iOS app with EAS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🧱 Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: 📦 Install dependencies
+        run: npm install
+
+      - name: 🛠️ Configure Expo credentials
+        run: npx eas whoami || npx eas login --token ${{ secrets.EXPO_TOKEN }}
+
+      - name: 🚀 EAS Build (iOS)
+        run: npx eas build --platform ios --non-interactive --profile production
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+// ===== End of File: {label} =====
+// ===== End of File: __tests__/chat-service.test.ts =====
+
+// ===== File: deploy_monGARS_bundle.py =====
+#!/usr/bin/env python3
+import os
+import re
+
+SOURCE_FILE = "monGARS_complete_project_bundle.txt"
+DEST_DIR = "monGARS_project"
+
+def parse_and_write_files():
+    if not os.path.exists(DEST_DIR):
+        os.makedirs(DEST_DIR)
+
+    with open(SOURCE_FILE, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    pattern = r"// ===== File: (.*?) =====\n\n(.*?)\n\n// ===== End of File: \1 ====="
+    matches = re.findall(pattern, content, re.DOTALL)
+
+    for filename, file_content in matches:
+        full_path = os.path.join(DEST_DIR, filename)
+        os.makedirs(os.path.dirname(full_path), exist_ok=True)
+        with open(full_path, "w", encoding="utf-8") as out_file:
+            out_file.write(file_content.strip())
+        print(f"[✔] Created: {full_path}")
+
+def run_post_install():
+    os.chdir(DEST_DIR)
+    if os.path.exists("package.json"):
+        print("[🔧] Running npm install...")
+        os.system("npm install")
+    else:
+        print("[⚠️] No package.json found, skipping npm install.")
+
+if __name__ == "__main__":
+    parse_and_write_files()
+    run_post_install()
+// ===== End of File: deploy_monGARS_bundle.py =====

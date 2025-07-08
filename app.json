@@ -1,0 +1,56 @@
+// ====================================================================================
+{
+  "expo": {
+    "name": "monGARS AI",
+    "slug": "mon-gars-ai",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#111827"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mongars.ai",
+      "buildNumber": "1.0.0",
+      "infoPlist": {
+        "NSSpeechRecognitionUsageDescription": "L'application utilise la reconnaissance vocale pour convertir votre voix en texte.",
+        "NSMicrophoneUsageDescription": "L'application a besoin d'accéder au microphone pour la reconnaissance vocale."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#111827"
+      },
+      "package": "com.mongars.ai"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "newArchEnabled": true
+          },
+          "android": {
+            "newArchEnabled": true
+          }
+        }
+      ]
+    ]
+  }
+}
+
+
+// ====================================================================================
+// ===== End of File: app.json =====
+

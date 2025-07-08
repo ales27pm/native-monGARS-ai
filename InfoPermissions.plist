@@ -1,0 +1,10 @@
+
+<key>NSMicrophoneUsageDescription</key>
+<string>L'application a besoin d'accéder au microphone pour la reconnaissance vocale.</string>
+<key>NSSpeechRecognitionUsageDescription</key>
+<string>L'application utilise la reconnaissance vocale pour convertir votre voix en texte.</string>
+<key>NSCameraUsageDescription</key>
+<string>L'application a besoin de la caméra pour la reconnaissance optique de caractères (OCR).</string>
+
+// ===== End of File: {label} =====
+

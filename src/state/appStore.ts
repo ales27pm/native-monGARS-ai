@@ -1,0 +1,128 @@
+// ====================================================================================
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import * as SecureStore from 'expo-secure-store';
+import { AIProvider, ServiceStatus, ApiKeys } from '../types/ai';
+import { checkOpenAIService } from '../api/openai';
+import { checkAnthropicService } from '../api/anthropic';
+import { checkGrokService } from '../api/grok';
+import { logger } from '../utils/logger';
+
+interface AppSettings {
+    theme: 'light' | 'dark';
+    defaultProvider: AIProvider;
+}
+
+interface AppState {
+    settings: AppSettings;
+    apiKeys: ApiKeys;
+    serviceStatus: Record<AIProvider, ServiceStatus>;
+    setTheme: (theme: 'light' | 'dark') => void;
+    setDefaultProvider: (provider: AIProvider) => void;
+    setApiKey: (provider: keyof ApiKeys, key: string) => Promise<void>;
+    loadSettings: () => Promise<void>;
+    checkService: (provider: AIProvider) => Promise<void>;
+    checkAllServices: () => Promise<void>;
+}
+
+const initialApiKeys: ApiKeys = {
+    openai: '',
+    anthropic: '',
+    grok: '',
+};
+
+const initialServiceStatus: ServiceStatus = { ok: false, error: 'unchecked' };
+
+const useAppStore = create<AppState>()(
+    persist(
+        (set, get) => ({
+            settings: {
+                theme: 'dark',
+                defaultProvider: 'local',
+            },
+            apiKeys: initialApiKeys,
+            serviceStatus: {
+                local: { ok: true, error: null },
+                openai: initialServiceStatus,
+                anthropic: initialServiceStatus,
+                grok: initialServiceStatus,
+            },
+            setTheme: (theme) => set(state => ({ settings: { ...state.settings, theme } })),
+            setDefaultProvider: (provider) => set(state => ({ settings: { ...state.settings, defaultProvider: provider } })),
+            setApiKey: async (provider, key) => {
+                set(state => ({
+                    apiKeys: { ...state.apiKeys, [provider]: key },
+                }));
+            },
+            loadSettings: async () => {
+                logger.info('appStore', 'Les paramètres et clés API ont été chargés depuis AsyncStorage.');
+                get().checkAllServices();
+            },
+            checkService: async (provider) => {
+                const { apiKeys } = get();
+                let status: ServiceStatus = { ok: false, error: 'unknown' };
+                const apiKey = apiKeys[provider as keyof ApiKeys];
+
+                if (!apiKey) {
+                    status = { ok: false, error: 'missing_key' };
+                } else {
+                    try {
+                        switch (provider) {
+                            case 'openai':
+                                await checkOpenAIService(apiKey);
+                                status = { ok: true, error: null };
+                                break;
+                            case 'anthropic':
+                                await checkAnthropicService(apiKey);
+                                status = { ok: true, error: null };
+                                break;
+                            case 'grok':
+                                await checkGrokService(apiKey);
+                                status = { ok: true, error: null };
+                                break;
+                            case 'local':
+                                status = { ok: true, error: null };
+                                break;
+                        }
+                    } catch (e) {
+                         const err = e as Error;
+                         logger.warn('appStore', `Échec de la vérification du service ${provider}`, err);
+                         status = { ok: false, error: err.message };
+                    }
+                }
+                set(state => ({
+                    serviceStatus: { ...state.serviceStatus, [provider]: status },
+                }));
+            },
+            checkAllServices: async () => {
+                logger.info('appStore', 'Vérification de tous les services cloud...');
+                const { checkService } = get();
+                await Promise.all([
+                    checkService('openai'),
+                    checkService('anthropic'),
+                    checkService('grok'),
+                ]);
+                logger.info('appStore', 'Vérification de tous les services terminée.');
+            },
+        }),
+        {
+            name: 'monGARS-storage',
+            storage: {
+                getItem: async (key) => SecureStore.getItemAsync(key),
+                setItem: async (key, value) => SecureStore.setItemAsync(key, value),
+                removeItem: async (key) => SecureStore.deleteItemAsync(key)
+            },
+            partialize: (state) => ({
+                settings: state.settings,
+                apiKeys: state.apiKeys,
+            }),
+        }
+    )
+);
+
+export default useAppStore;
+
+
+// ====================================================================================
+// ===== End of File: src/state/appStore.ts =====
+

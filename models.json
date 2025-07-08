@@ -1,0 +1,30 @@
+
+[
+  {
+    "id": "llama-3.2-3b-instruct",
+    "name": "Llama 3.2 3B Instruct (andmev)",
+    "description": "Optimized LLaMA 3.2 model for Core ML on-device inference.",
+    "sizeMB": 4200,
+    "contextLength": 2048,
+    "url": "https://huggingface.co/andmev/Llama-3.2-3B-Instruct-CoreML/resolve/main/llama-3.2-3b.mlpackage.tar"
+  },
+  {
+    "id": "mistral-coreml",
+    "name": "Mistral Core ML (Apple)",
+    "description": "Apple-optimized Mistral model converted to Core ML format.",
+    "sizeMB": 3900,
+    "contextLength": 4096,
+    "url": "https://huggingface.co/apple/mistral-coreml/resolve/main/Mistral7BInstruct.mlpackage.tar"
+  },
+  {
+    "id": "mixtral-coreml",
+    "name": "Mixtral 8x7B (CoreML-Community)",
+    "description": "Mixture of Experts LLM optimized for iOS Core ML execution.",
+    "sizeMB": 6700,
+    "contextLength": 8192,
+    "url": "https://huggingface.co/coreml-community/mixtral-8x7b/resolve/main/Mixtral8x7B.mlpackage.tar"
+  }
+]
+
+// ===== End of File: {label} =====
+
