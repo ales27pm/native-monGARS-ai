@@ -33,7 +33,9 @@ class LocalLLMService {
             const abortHandler = () => {
                 cleanup();
                 coreMLService.stopGeneration();
-                reject(new Error('AbortError'));
+                const error = new Error('La génération a été annulée par l\'utilisateur.');
+                error.name = 'AbortError';
+                reject(error);
             };
 
             const cleanup = () => {
