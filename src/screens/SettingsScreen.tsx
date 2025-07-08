@@ -26,7 +26,8 @@ export default function SettingsScreen() {
         checkAllServices,
         setTheme,
         apiKeys,
-        loadSettings
+        loadSettings,
+        setUseMetal
     } = useAppStore();
     
     const [localApiKeys, setLocalApiKeys] = useState(apiKeys);
@@ -134,6 +135,19 @@ export default function SettingsScreen() {
                         onValueChange={(value) => setTheme(value ? 'dark' : 'light')}
                         trackColor={{ false: "#767577", true: "#3b82f6" }}
                         thumbColor={settings.theme === 'dark' ? "#f4f3f4" : "#f4f3f4"}
+                    />
+                </View>
+            </View>
+
+            <View className="p-4 bg-dark-surface rounded-lg">
+                <Text className="text-xl font-bold text-dark-text mb-4">Paramètres du LLM local</Text>
+                <View className="flex-row justify-between items-center">
+                    <Text className="text-lg text-dark-text">Utiliser Metal</Text>
+                    <Switch
+                        value={settings.useMetal}
+                        onValueChange={(value) => setUseMetal(value)}
+                        trackColor={{ false: "#767577", true: "#3b82f6" }}
+                        thumbColor={settings.useMetal ? "#f4f3f4" : "#f4f3f4"}
                     />
                 </View>
             </View>

@@ -1,6 +1,7 @@
 // ====================================================================================
 import Anthropic from '@anthropic-ai/sdk';
 import { logger } from '../utils/logger';
+import { AIMessage } from '../types/ai';
 
 export async function checkAnthropicService(apiKey: string): Promise<void> {
     if (!apiKey) throw new Error('missing_key');
@@ -27,6 +28,21 @@ export async function getAnthropicChatCompletion(messages: AIMessage[], apiKey: 
         return response.content[0].text;
     }
     throw new Error('Réponse inattendue de l\'API Anthropic.');
+}
+
+export async function getAnthropicStream(messages: AIMessage[], apiKey: string, onToken: (token: string) => void): Promise<void> {
+    const anthropic = new Anthropic({ apiKey });
+    const stream = await anthropic.messages.stream({
+        model: "claude-3-haiku-20240307",
+        max_tokens: 1024,
+        messages: messages.map((msg) => ({ role: msg.role, content: msg.content })),
+    });
+
+    for await (const event of stream) {
+        if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+            onToken(event.delta.text);
+        }
+    }
 }
 
 

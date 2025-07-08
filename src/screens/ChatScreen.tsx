@@ -4,7 +4,7 @@ import { Feather } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MessageBubble } from '../components/MessageBubble';
 import { AIMessage } from '../types/ai';
-import { chatService } from '../api/chat-service';
+import { chatService, stopGeneration } from '../api/chat-service';
 import useAppStore from '../state/appStore';
 import { logger } from '../utils/logger';
 
@@ -23,26 +23,30 @@ export default function ChatScreen() {
         const assistantPlaceholder: AIMessage = { id: assistantMessageId, role: 'assistant', content: '', timestamp: new Date().toISOString() };
 
         setMessages([...conversationHistory, assistantPlaceholder]);
-        setInput(''); setIsGenerating(true);
+        setInput('');
+        setIsGenerating(true);
         setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
 
         try {
             await chatService.streamAIResponse(conversationHistory, settings.defaultProvider, (token) => {
-                setMessages(prev => prev.map(msg =>
+                setMessages(prev => prev.map(msg => 
                     msg.id === assistantMessageId ? { ...msg, content: msg.content + token } : msg
                 ));
             });
         } catch (error) {
-            logger.error('ChatScreen', 'Erreur de streaming', error);
-            setMessages(prev => prev.map(msg =>
-                msg.id === assistantMessageId
-                    ? { ...msg, content: `Désolé, une erreur est survenue : ${(error as Error).message}`, isError: true }
-                    : msg
+            logger.error('ChatScreen', 'Erreur lors de la génération de la réponse IA', error);
+            setMessages(prev => prev.map(msg => 
+                msg.id === assistantMessageId ? { ...msg, content: 'Erreur de connexion.' } : msg
             ));
         } finally {
             setIsGenerating(false);
         }
     }, [input, isGenerating, settings.defaultProvider, messages]);
+
+    const handleStop = () => {
+        stopGeneration();
+        setIsGenerating(false);
+    };
 
     return (
         <SafeAreaView edges={['bottom']} style={{ flex: 1 }} className="bg-dark-bg">
@@ -59,9 +63,15 @@ export default function ChatScreen() {
                 </View>
                 <View className="flex-row items-center p-4 border-t border-dark-border bg-dark-surface">
                     <TextInput value={input} onChangeText={setInput} placeholder="Écrivez votre message..." placeholderTextColor="#9ca3af" className="flex-1 bg-dark-bg border border-dark-border rounded-full py-3 px-4 text-dark-text" editable={!isGenerating} multiline />
-                    <TouchableOpacity onPress={handleSend} disabled={!input.trim() || isGenerating} className="ml-3 bg-brand-blue p-3 rounded-full">
-                        <Feather name="send" size={24} color="white" />
-                    </TouchableOpacity>
+                    {isGenerating ? (
+                        <TouchableOpacity onPress={handleStop} className="ml-3 bg-red-500 p-3 rounded-full">
+                            <Feather name="stop-circle" size={24} color="white" />
+                        </TouchableOpacity>
+                    ) : (
+                        <TouchableOpacity onPress={handleSend} disabled={!input.trim()} className="ml-3 bg-brand-blue p-3 rounded-full">
+                            <Feather name="send" size={24} color="white" />
+                        </TouchableOpacity>
+                    )}
                 </View>
             </KeyboardAvoidingView>
         </SafeAreaView>

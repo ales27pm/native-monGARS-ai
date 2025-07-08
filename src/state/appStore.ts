@@ -2,28 +2,11 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import * as SecureStore from 'expo-secure-store';
-import { AIProvider, ServiceStatus, ApiKeys } from '../types/ai';
+import { AIProvider, ServiceStatus, ApiKeys, AppSettings, AppState } from '../types/ai';
 import { checkOpenAIService } from '../api/openai';
 import { checkAnthropicService } from '../api/anthropic';
 import { checkGrokService } from '../api/grok';
 import { logger } from '../utils/logger';
-
-interface AppSettings {
-    theme: 'light' | 'dark';
-    defaultProvider: AIProvider;
-}
-
-interface AppState {
-    settings: AppSettings;
-    apiKeys: ApiKeys;
-    serviceStatus: Record<AIProvider, ServiceStatus>;
-    setTheme: (theme: 'light' | 'dark') => void;
-    setDefaultProvider: (provider: AIProvider) => void;
-    setApiKey: (provider: keyof ApiKeys, key: string) => Promise<void>;
-    loadSettings: () => Promise<void>;
-    checkService: (provider: AIProvider) => Promise<void>;
-    checkAllServices: () => Promise<void>;
-}
 
 const initialApiKeys: ApiKeys = {
     openai: '',
@@ -39,6 +22,7 @@ const useAppStore = create<AppState>()(
             settings: {
                 theme: 'dark',
                 defaultProvider: 'local',
+                useMetal: false,
             },
             apiKeys: initialApiKeys,
             serviceStatus: {
@@ -49,6 +33,7 @@ const useAppStore = create<AppState>()(
             },
             setTheme: (theme) => set(state => ({ settings: { ...state.settings, theme } })),
             setDefaultProvider: (provider) => set(state => ({ settings: { ...state.settings, defaultProvider: provider } })),
+            setUseMetal: (useMetal) => set(state => ({ settings: { ...state.settings, useMetal } })),
             setApiKey: async (provider, key) => {
                 set(state => ({
                     apiKeys: { ...state.apiKeys, [provider]: key },
@@ -102,16 +87,15 @@ const useAppStore = create<AppState>()(
                     checkService('anthropic'),
                     checkService('grok'),
                 ]);
-                logger.info('appStore', 'Vérification de tous les services terminée.');
             },
         }),
         {
-            name: 'monGARS-storage',
-            storage: {
-                getItem: async (key) => SecureStore.getItemAsync(key),
-                setItem: async (key, value) => SecureStore.setItemAsync(key, value),
-                removeItem: async (key) => SecureStore.deleteItemAsync(key)
-            },
+            name: 'app-storage',
+            storage: createJSONStorage(() => ({ // Correction pour SecureStore
+                setItem: SecureStore.setItemAsync,
+                getItem: SecureStore.getItemAsync,
+                removeItem: SecureStore.deleteItemAsync,
+            })),
             partialize: (state) => ({
                 settings: state.settings,
                 apiKeys: state.apiKeys,

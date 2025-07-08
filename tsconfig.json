@@ -3,6 +3,11 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "jsx": "react-native",
+    "lib": [
+      "es2017"
+    ],
+    "target": "es6",
     "paths": {
       "@/*": [
         "./src/*"
@@ -14,6 +19,9 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
+  ],
+  "files": [
+    "global.d.ts"
   ]
 }
 

@@ -38,6 +38,24 @@ export interface DownloadProgressEvent {
     error?: string;
 }
 
+export interface AppSettings {
+    theme: 'light' | 'dark';
+    defaultProvider: AIProvider;
+    useMetal: boolean;
+}
+
+export interface AppState {
+    settings: AppSettings;
+    apiKeys: ApiKeys;
+    serviceStatus: Record<AIProvider, ServiceStatus>;
+    setTheme: (theme: 'light' | 'dark') => void;
+    setDefaultProvider: (provider: AIProvider) => void;
+    setUseMetal: (useMetal: boolean) => void;
+    setApiKey: (provider: keyof ApiKeys, key: string) => Promise<void>;
+    loadSettings: () => Promise<void>;
+    checkService: (provider: AIProvider) => Promise<void>;
+    checkAllServices: () => Promise<void>;
+}
 
 // ====================================================================================
 // ===== End of File: src/types/ai.ts =====

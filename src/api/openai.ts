@@ -1,12 +1,13 @@
 // ====================================================================================
 import OpenAI from 'openai';
 import { logger } from '../utils/logger';
+import { AIMessage } from '../types/ai';
 
 export async function checkOpenAIService(apiKey: string): Promise<void> {
     if (!apiKey) throw new Error('missing_key');
     try {
         const openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
-        await openai.models.list({ limit: 1 });
+        await openai.models.list();
         logger.info('OpenAI', 'La clé API OpenAI est valide.');
     } catch (error) {
         logger.warn('OpenAI', 'La vérification de la clé API OpenAI a échoué.', error);
@@ -26,6 +27,22 @@ export async function getOpenAIChatCompletion(messages: AIMessage[], apiKey: str
         throw new Error('Réponse vide de l\'API OpenAI.');
     }
     return content;
+}
+
+export async function getOpenAIStream(messages: AIMessage[], apiKey: string, onToken: (token: string) => void): Promise<void> {
+    const openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
+    const stream = await openai.chat.completions.create({
+        messages: messages.map((msg) => ({ role: msg.role, content: msg.content })),
+        model: 'gpt-4o-mini',
+        stream: true,
+    });
+
+    for await (const chunk of stream) {
+        const content = chunk.choices[0]?.delta?.content;
+        if (content) {
+            onToken(content);
+        }
+    }
 }
 
 

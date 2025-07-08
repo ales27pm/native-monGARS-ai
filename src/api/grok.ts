@@ -1,6 +1,7 @@
 // ====================================================================================
 import OpenAI from 'openai';
 import { logger } from '../utils/logger';
+import { AIMessage } from '../types/ai';
 
 export async function checkGrokService(apiKey: string): Promise<void> {
     if (!apiKey) throw new Error('missing_key');
@@ -35,6 +36,27 @@ export async function getGrokChatCompletion(messages: AIMessage[], apiKey: strin
         throw new Error('Réponse vide de l\'API Grok.');
     }
     return content;
+}
+
+export async function getGrokStream(messages: AIMessage[], apiKey: string, onToken: (token: string) => void): Promise<void> {
+    const grok = new OpenAI({
+        apiKey,
+        baseURL: 'https://api.x.ai/v1',
+        dangerouslyAllowBrowser: true,
+    });
+
+    const stream = await grok.chat.completions.create({
+        messages: messages.map((msg) => ({ role: msg.role, content: msg.content })),
+        model: 'grok-1.5-flash',
+        stream: true,
+    });
+
+    for await (const chunk of stream) {
+        const content = chunk.choices[0]?.delta?.content;
+        if (content) {
+            onToken(content);
+        }
+    }
 }
 
 

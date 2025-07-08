@@ -1,35 +1,62 @@
-import { AIMessage, AIProvider } from '../types/ai';
-import { localLLMService } from './local-llm';
 import { getOpenAIStream } from './openai';
 import { getAnthropicStream } from './anthropic';
 import { getGrokStream } from './grok';
-import useAppStore from '../state/appStore';
+import { getLocalStream } from './local';
+import { AIMessage, AIProvider } from '../types/ai';
 import { logger } from '../utils/logger';
+import useAppStore from '../state/appStore';
 
 class ChatService {
+    private isGenerating = false;
+
     public async streamAIResponse(messages: AIMessage[], provider: AIProvider, onToken: (token: string) => void): Promise<void> {
-        logger.info('ChatService', `Demande de stream IA au fournisseur: ${provider}`);
-        const { apiKeys } = useAppStore.getState();
+        if (this.isGenerating) {
+            logger.warn('ChatService', 'Une génération est déjà en cours.');
+            return;
+        }
+        this.isGenerating = true;
+
         try {
+            const { apiKeys } = useAppStore.getState();
+            let streamer;
+
             switch (provider) {
-                case 'local': return await localLLMService.streamResponse(messages, onToken);
                 case 'openai':
-                    if (!apiKeys.openai) throw new Error('Clé API OpenAI manquante.');
-                    return await getOpenAIStream(messages, apiKeys.openai, onToken);
+                    streamer = (msgs: AIMessage[], onTkn: (tkn: string) => void) => getOpenAIStream(msgs, apiKeys.openai, onTkn);
+                    break;
                 case 'anthropic':
-                    if (!apiKeys.anthropic) throw new Error('Clé API Anthropic manquante.');
-                    return await getAnthropicStream(messages, apiKeys.anthropic, onToken);
+                    streamer = (msgs: AIMessage[], onTkn: (tkn: string) => void) => getAnthropicStream(msgs, apiKeys.anthropic, onTkn);
+                    break;
                 case 'grok':
-                    if (!apiKeys.grok) throw new Error('Clé API Grok manquante.');
-                    return await getGrokStream(messages, apiKeys.grok, onToken);
-                default: throw new Error(`Fournisseur inconnu: ${provider}`);
+                    streamer = (msgs: AIMessage[], onTkn: (tkn: string) => void) => getGrokStream(msgs, apiKeys.grok, onTkn);
+                    break;
+                case 'local':
+                    streamer = getLocalStream;
+                    break;
+                default:
+                    logger.error('ChatService', `Fournisseur non supporté: ${provider}`);
+                    throw new Error(`Fournisseur non supporté: ${provider}`);
             }
+            
+            await streamer(messages, onToken);
+
         } catch (error) {
-            logger.error('ChatService', `Erreur de streaming avec le fournisseur ${provider}`, error);
+            logger.error('ChatService', 'Erreur lors du streaming de la réponse IA', error);
             throw error;
+        } finally {
+            this.isGenerating = false;
+        }
+    }
+
+    public stopGeneration(): void {
+        if (this.isGenerating) {
+            this.isGenerating = false; // This is a simplified stop mechanism
+            logger.info('ChatService', 'Arrêt de la génération demandé.');
         }
     }
 }
+
 export const chatService = new ChatService();
+export const stopGeneration = () => chatService.stopGeneration();
 
 
