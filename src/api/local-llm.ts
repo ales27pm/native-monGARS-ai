@@ -18,26 +18,34 @@ class LocalLLMService {
 
         return new Promise((resolve, reject) => {
             const eventEmitter = new NativeEventEmitter(TurboModuleRegistry.LocalLLMModule);
+
             const tokenListener = eventEmitter.addListener('onGeneratedToken', (event: { token: string }) => onToken(event.token));
-            const endListener = eventEmitter.addListener('onGenerationEnd', (event?: { error?: string }) => {
+            
+            const cleanup = () => {
                 tokenListener.remove();
                 endListener.remove();
-                abortListener.remove();
-                event?.error ? reject(new Error(event.error)) : resolve();
+                signal.removeEventListener('abort', abortHandler);
+            };
+
+            const endListener = eventEmitter.addListener('onGenerationEnd', (event?: { error?: string }) => {
+                cleanup();
+                if (event?.error) {
+                    reject(new Error(event.error));
+                } else {
+                    resolve();
+                }
             });
 
-            const abortListener = signal.addEventListener('abort', () => {
-                tokenListener.remove();
-                endListener.remove();
-                abortListener.remove();
+            const abortHandler = () => {
+                cleanup();
                 coreMLService.stopGeneration();
                 reject(new Error('AbortError'));
-            });
+            };
+
+            signal.addEventListener('abort', abortHandler);
 
             coreMLService.generateStream(messages).catch(err => {
-                tokenListener.remove();
-                endListener.remove();
-                abortListener.remove();
+                cleanup();
                 reject(err);
             });
         });

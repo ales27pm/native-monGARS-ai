@@ -1,6 +1,6 @@
 // ====================================================================================
 import { TurboModuleRegistry } from '../services/TurboModuleRegistry';
-import { CoreMLModel } from '../types/ai';
+import { CoreMLModel, AIMessage } from '../types/ai';
 import { logger } from '../utils/logger';
 
 class CoreMLService {
