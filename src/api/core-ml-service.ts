@@ -36,9 +36,15 @@ class CoreMLService {
         return this.module.cancelDownload(modelId);
     }
 
-    public generateText(prompt: string): Promise<string> {
-        logger.info('CoreMLService', 'Génération de texte avec le modèle local actif...');
-        return this.module.generateText(prompt, 512, 0.7, 0.9);
+    public generateStream(messages: AIMessage[]): Promise<void> {
+        logger.info('CoreMLService', 'Génération de texte en streaming avec le modèle local actif...');
+        const nativeMessages = messages.map(({ role, content }) => ({ role, content }));
+        return this.module.generateStream(nativeMessages);
+    }
+
+    public stopGeneration(): Promise<void> {
+        logger.info('CoreMLService', 'Arrêt de la génération de texte...');
+        return this.module.stopGeneration();
     }
     
     public getAvailableSpace(): Promise<string> {
