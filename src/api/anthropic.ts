@@ -57,9 +57,6 @@ export async function getAnthropicStream(messages: AIMessage[], apiKey: string, 
     }, { signal });
 
     for await (const chunk of stream) {
-        if (signal.aborted) {
-            throw new Error('AbortError');
-        }
         if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
             onToken(chunk.delta.text);
         }

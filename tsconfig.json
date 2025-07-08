@@ -15,7 +15,8 @@
   },
   "include": [
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "nativewind-env.d.ts"
   ],
   "files": [
     "global.d.ts"

@@ -52,9 +52,6 @@ export async function getGrokStream(messages: AIMessage[], apiKey: string, onTok
     }, { signal });
 
     for await (const chunk of stream) {
-        if (signal.aborted) {
-            throw new Error('AbortError');
-        }
         const content = chunk.choices[0]?.delta?.content;
         if (content) {
             onToken(content);

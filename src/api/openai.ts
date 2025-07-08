@@ -38,9 +38,6 @@ export async function getOpenAIStream(messages: AIMessage[], apiKey: string, onT
     }, { signal });
 
     for await (const chunk of stream) {
-        if (signal.aborted) {
-            throw new Error('AbortError');
-        }
         const content = chunk.choices[0]?.delta?.content;
         if (content) {
             onToken(content);

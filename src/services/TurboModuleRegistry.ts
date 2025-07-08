@@ -15,6 +15,7 @@ const createProxy = (): LocalLLMModuleSpec => {
             if (prop === 'getAvailableModels') return () => Promise.resolve([]);
             if (prop === 'getAvailableSpace') return () => Promise.resolve('N/A');
             if (prop === 'generateText') return () => Promise.resolve('Mode local non disponible.');
+            if (prop === 'stopGeneration') return () => Promise.resolve();
             if (prop === 'addListener' || prop === 'removeListeners') return () => {};
             return unsupported;
         }

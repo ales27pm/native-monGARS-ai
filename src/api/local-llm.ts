@@ -21,12 +21,6 @@ class LocalLLMService {
 
             const tokenListener = eventEmitter.addListener('onGeneratedToken', (event: { token: string }) => onToken(event.token));
             
-            const cleanup = () => {
-                tokenListener.remove();
-                endListener.remove();
-                signal.removeEventListener('abort', abortHandler);
-            };
-
             const endListener = eventEmitter.addListener('onGenerationEnd', (event?: { error?: string }) => {
                 cleanup();
                 if (event?.error) {
@@ -40,6 +34,12 @@ class LocalLLMService {
                 cleanup();
                 coreMLService.stopGeneration();
                 reject(new Error('AbortError'));
+            };
+
+            const cleanup = () => {
+                tokenListener.remove();
+                endListener.remove();
+                signal.removeEventListener('abort', abortHandler);
             };
 
             signal.addEventListener('abort', abortHandler);
